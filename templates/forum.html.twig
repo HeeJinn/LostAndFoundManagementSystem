@@ -1,0 +1,38 @@
+{% extends "base.html.twig" %}
+
+{% block title %}
+Lost and Found Forum
+{% endblock %}
+
+{% block content %}
+<div class="container bg-body-tertiary py-3">
+    <h1>List of lost items</h1>
+    <div class="row justify-content-center g-4 mt-3">
+
+        {% if items is not empty %}
+        {% for item in items %}
+
+        {# 3. Simplified the column classes for better readability #}
+        <div class="col-md-6 col-lg-4 col-xl-3">
+
+            {# 4. REMOVED style="width: 18rem;" to make the card responsive #}
+            <div class="card h-100"> 
+                <img src="https://scontent.fmnl25-3.fna.fbcdn.net/v/t39.30808-6/476641728_1653694862239183_6087302698822600876_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeFwZAWrzPGlMkkLeKwMDidauqu5WEriinC6q7lYSuKKcLhO5xVZKXGcNHsAFPiJZvtBKkNfd5YTreEz8SqqZh58&_nc_ohc=0tNYTGQXW2IQ7kNvwE_QBzH&_nc_oc=AdmgXxKQnzJkJ-urPC6dc86mfOTDr9__1vTvIsEpQKcIULUhkZpwirmkFkfX3GS5Wp4&_nc_zt=23&_nc_ht=scontent.fmnl25-3.fna&_nc_gid=Qe3lH6FjjlvATRpxqzMKew&oh=00_Aff0V_7ZsD4MAHuJNTMV8CwbtUQoYTVnsFp11Y_qSMbOdA&oe=68FB003D" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.item_name }}</h5>
+                    
+                    {# 5. Fixed the nested <p> tags #}
+                    <p class="card-text">Student ID: {{ item.student_id }}</p>
+                    <p class="card-text">Category: {{ item.category }}</p>
+
+                    <a href="#" class="btn btn-primary">Claim</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>No items found</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
