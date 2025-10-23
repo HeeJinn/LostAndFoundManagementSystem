@@ -5,35 +5,64 @@ Lost and Found Forum
 {% endblock %}
 
 {% block content %}
-<div class="container bg-body-tertiary py-3">
-    <h1>List of lost items</h1>
+<div class="container py-4">
+    <h3><i class="bi bi-file-earmark-medical px-2"></i>List of lost items</h3>
     {{name}}
     <div class="row justify-content-center g-4 mt-3">
+        <div class="row">
+            <div class="col-10">
+                <form action="">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-primary" id="search-item"><i class="bi bi-search text-light"></i></span>
+                        <input type="text" class="form-control" placeholder="Search Item" aria-label="Search" aria-describedby="search-item">
+                    </div>
+                </form>
+            </div>
+            <div class="col-2">
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Filter Category
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Action</a></li>
+                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
 
         {% if items is not empty %}
         {% for item in items %}
 
-        {# 3. Simplified the column classes for better readability #}
-        <div class="col-md-6 col-lg-4 col-xl-3">
-
-            {# 4. REMOVED style="width: 18rem;" to make the card responsive #}
-            <div class="card h-100"> 
-                <img src="https://scontent.fmnl25-3.fna.fbcdn.net/v/t39.30808-6/476641728_1653694862239183_6087302698822600876_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeFwZAWrzPGlMkkLeKwMDidauqu5WEriinC6q7lYSuKKcLhO5xVZKXGcNHsAFPiJZvtBKkNfd5YTreEz8SqqZh58&_nc_ohc=0tNYTGQXW2IQ7kNvwE_QBzH&_nc_oc=AdmgXxKQnzJkJ-urPC6dc86mfOTDr9__1vTvIsEpQKcIULUhkZpwirmkFkfX3GS5Wp4&_nc_zt=23&_nc_ht=scontent.fmnl25-3.fna&_nc_gid=Qe3lH6FjjlvATRpxqzMKew&oh=00_Aff0V_7ZsD4MAHuJNTMV8CwbtUQoYTVnsFp11Y_qSMbOdA&oe=68FB003D" class="card-img-top" alt="...">
-                <div class="card-body">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card h-100 shadow border-0">
+                <div class="card-img-container ratio ratio-4x3">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFCNoTGDEmzsx5o-Od7WDRwyi7pISwBwyJSw&s" class="card-img-top" alt="Wireless Earbuds">
+                </div>
+                <div class="card-body d-flex flex-column">
                     <h5 class="card-title">{{ item.item_name }}</h5>
-                    
-                    {# 5. Fixed the nested <p> tags #}
-                    <p class="card-text">Student ID: {{ item.student_id }}</p>
-                    <p class="card-text">Category: {{ item.category }}</p>
-
-                    <a href="#" class="btn btn-primary">Claim</a>
+                    <p class="card-text text-muted small">{{ item.student_id }}</p>
+                    <a href="#" class="btn btn-primary w-100 mt-auto">View Details</a>
                 </div>
             </div>
         </div>
+
         {% endfor %}
         {% else %}
         <p>No items found</p>
         {% endif %}
+        <nav aria-label="...">
+            <ul class="pagination justify-content-center">
+                <li class="page-item"><a href="#" class="page-link">Previous</a></li>
+                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item active">
+                    <a class="page-link" href="#" aria-current="page">2</a>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item"><a class="page-link" href="#">Next</a></li>
+            </ul>
+        </nav>
     </div>
 </div>
 {% endblock %}
