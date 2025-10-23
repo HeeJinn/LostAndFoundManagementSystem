@@ -7,62 +7,97 @@ Lost and Found Forum
 {% block content %}
 <div class="container py-4">
     <h3><i class="bi bi-file-earmark-medical px-2"></i>List of lost items</h3>
-    {{name}}
-    <div class="row justify-content-center g-4 mt-3">
-        <div class="row">
-            <div class="col-10">
-                <form action="">
-                    <div class="input-group mb-3">
-                        <span class="input-group-text bg-primary" id="search-item"><i class="bi bi-search text-light"></i></span>
-                        <input type="text" class="form-control" placeholder="Search Item" aria-label="Search" aria-describedby="search-item">
-                    </div>
-                </form>
-            </div>
-            <div class="col-2">
-                <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Filter Category
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Action</a></li>
-                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                    </ul>
+
+    <div class="row g-3 align-items-center my-3">
+        <div class="col">
+            <form action="">
+                <div class="input-group">
+                    <span class="input-group-text bg-primary text-light" id="search-item"><i class="bi bi-search"></i></span>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search for an item..." aria-label="Search" aria-describedby="search-item">
                 </div>
+            </form>
+        </div>
+        <div class="col-12 col-md-auto">
+            <div class="dropdown d-grid">
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    {# THE FIX: The initial text is now the default category #}
+                    <span id="filter-button-label">All Categories</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item filter-option" href="#" data-category="all">All Categories</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item filter-option" href="#" data-category="electronics">Electronics</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-category="books">Books & Notes</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-category="clothing">Clothing</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-category="ids">IDs & Cards</a></li>
+                </ul>
             </div>
         </div>
+    </div>
 
+
+    <div class="row justify-content-center g-4 pt-3">
         {% if items is not empty %}
         {% for item in items %}
-
         <div class="col-lg-3 col-md-6 mb-4">
             <div class="card h-100 shadow border-0">
                 <div class="card-img-container ratio ratio-4x3">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFCNoTGDEmzsx5o-Od7WDRwyi7pISwBwyJSw&s" class="card-img-top" alt="Wireless Earbuds">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFCNoTGDEmzsx5o-Od7WDRwyi7pISwBwyJSw&s" class="card-img-top" alt="Item Image">
                 </div>
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">{{ item.item_name }}</h5>
-                    <p class="card-text text-muted small">{{ item.student_id }}</p>
+                    <p class="card-text text-muted small">Student ID: {{ item.student_id }}</p>
                     <a href="#" class="btn btn-primary w-100 mt-auto">View Details</a>
                 </div>
             </div>
         </div>
-
         {% endfor %}
         {% else %}
-        <p>No items found</p>
+        <div class="col-12 text-center">
+            <p class="text-muted">No items found.</p>
+        </div>
         {% endif %}
-        <nav aria-label="...">
-            <ul class="pagination justify-content-center">
-                <li class="page-item"><a href="#" class="page-link">Previous</a></li>
-                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                <li class="page-item active">
-                    <a class="page-link" href="#" aria-current="page">2</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item"><a class="page-link" href="#">Next</a></li>
-            </ul>
-        </nav>
     </div>
+
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center mt-4">
+            <li class="page-item disabled"><a href="#" class="page-link">Previous</a></li>
+            <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+        </ul>
+    </nav>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterButtonLabel = document.getElementById('filter-button-label');
+        const filterOptions = document.querySelectorAll('.filter-option');
+
+        filterOptions.forEach(option => {
+            option.addEventListener('click', function(event) {
+                // Prevent the link from navigating
+                event.preventDefault();
+
+                // Get the text from the clicked item (e.g., "Electronics")
+                const selectedCategoryText = this.textContent;
+
+                // Get the category value for your AJAX call
+                const selectedCategoryValue = this.dataset.category;
+
+                // Update the button's text
+                filterButtonLabel.textContent = selectedCategoryText;
+
+                // You can now use selectedCategoryValue in your AJAX request
+                console.log('Selected category:', selectedCategoryValue);
+                // Example: performAjaxSearch(document.getElementById('searchInput').value, selectedCategoryValue);
+            });
+        });
+    });
+</script>
+
 {% endblock %}
