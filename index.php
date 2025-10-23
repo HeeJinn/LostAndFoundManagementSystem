@@ -30,15 +30,21 @@ switch ($route) {
         break; 
 
     case '/lostitems':
-
-                $items = $conn->query("SELECT * FROM item");
+        $items = $conn->query("SELECT * FROM item");
         $items->execute();
         $allItems = $items->fetchAll(PDO::FETCH_OBJ);
 
         echo $twig->render('forum.html.twig', [
             'items' => $allItems,
         ]);
-        break; 
+        break;
+
+    case '/reportitem':
+
+        echo $twig->render('reportitem.html.twig', [
+        
+        ]);
+        break;
 
     default:
         http_response_code(404);

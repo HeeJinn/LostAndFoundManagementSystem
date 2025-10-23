@@ -45,9 +45,190 @@ Home
         <span class="visually-hidden">Next</span>
     </button>
 </section>
-<section>
-    <div class="container py-5">
-        <div class="text-center">Tangina diko alam ilalagay sa baba Home page, pic nalang kaya naten></div>
+
+<section class="container-fluid bg-secondary c-overview d-flex align-items-center">
+    <div class="row w-100 text-center fs-4">
+        <div class="col-sm text-white">
+            <i class="bi bi-flag me-2"></i>
+            Report a Lost Item
+        </div>
+        <div class="col-sm text-white">
+            <i class="bi bi-star me-2"></i>
+            Submit a Found Item
+        </div>
+        <div class="col-sm text-white">
+            <i class="bi bi-database-check me-2"></i>
+            Search the Database
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Latest Finds</h2>
+            <p class="text-muted">Here are some of the most recent items turned in to the L&F office.</p>
+        </div>
+        <div class="row">
+
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card h-100 shadow border-0">
+                    <div class="card-img-container ratio ratio-4x3">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0G3zTzVOk6Y-G9rtoh0a4XtFxNbkTWYFG7w&s" class="card-img-top" alt="Black Wallet">
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Black Leather Wallet</h5>
+                        <p class="card-text text-muted small">Found near the library on Oct 22, 2025.</p>
+                        <a href="#" class="btn btn-primary w-100 mt-auto">View Details</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card h-100 shadow border-0">
+                    <div class="card-img-container ratio ratio-4x3">
+                        <img src="https://media.wired.com/photos/67eda015bf140512fa8f50e5/4:3/w_640%2Cc_limit/Davek-Solo-Umbrella-Reviewer-Photo-SOURCE-Julian-Chokkattu-(no-border).jpg" class="card-img-top" alt="Blue Umbrella">
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Blue Umbrella</h5>
+                        <p class="card-text text-muted small">Found in the cafeteria on Oct 21, 2025.</p>
+                        <a href="#" class="btn btn-primary w-100 mt-auto">View Details</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card h-100 shadow border-0">
+                    <div class="card-img-container ratio ratio-4x3">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUOOruC7lHjX3SqoVrlgP_xCnfNCtjs59jhw&s" class="card-img-top" alt="University ID">
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">University ID Card</h5>
+                        <p class="card-text text-muted small">Found in the main hall on Oct 20, 2025.</p>
+                        <a href="#" class="btn btn-primary w-100 mt-auto">View Details</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card h-100 shadow border-0">
+                    <div class="card-img-container ratio ratio-4x3">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFCNoTGDEmzsx5o-Od7WDRwyi7pISwBwyJSw&s" class="card-img-top" alt="Wireless Earbuds">
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Wireless Earbuds</h5>
+                        <p class="card-text text-muted small">Found in the gym on Oct 19, 2025.</p>
+                        <a href="#" class="btn btn-primary w-100 mt-auto">View Details</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Help & Information</h2>
+            <p class="text-muted">Quick tips to keep your items safe and answers to common questions.</p>
+        </div>
+
+        <div class="row">
+
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h4 class="mb-3">Pro-Tips for Keeping Your Stuff Safe</h4>
+                <div class="accordion custom-accordion" id="tipsAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                <i class="bi bi-arrow-repeat text-primary pe-3"></i>
+                                Develop Good Habits
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#tipsAccordion">
+                            <div class="accordion-body">
+                                <strong>The best defense is a good offense.</strong> Building routines is the most effective way to prevent loss.
+                                <ul>
+                                    <li><strong>The "Exit Check":</strong> Before leaving anywhere, pat your pockets and glance in your bag. A simple mantra like <strong>"Phone, wallet, keys"</strong> works wonders.</li>
+                                    <li><strong>A Place for Everything:</strong> Designate a permanent home for essential items (e.g., a key hook by the door).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                <i class="bi bi-phone-vibrate text-success pe-3"></i>
+                                Use Technology to Your Advantage
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#tipsAccordion">
+                            <div class="accordion-body">
+                                <strong>Let your gadgets do the work.</strong> Leverage modern tools to keep track of your belongings like "Find My" features and Bluetooth trackers.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                <i class="bi bi-tags text-warning pe-3"></i>
+                                Label Your Items
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#tipsAccordion">
+                            <div class="accordion-body">
+                                <strong>Help the finder help you.</strong> An honest person can't return your item if they don't know who you are. Add a tag with your name and an email address.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <h4 class="mb-3">Frequently Asked Questions</h4>
+                <div class="accordion custom-accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq-headingOne">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-collapseOne" aria-expanded="false" aria-controls="faq-collapseOne">
+                                How long do you keep found items?
+                            </button>
+                        </h2>
+                        <div id="faq-collapseOne" class="accordion-collapse collapse" aria-labelledby="faq-headingOne" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                We hold all general items for <strong>30 days</strong>. High-value items (phones, wallets, laptops) are held for <strong>90 days</strong>.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq-headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-collapseTwo" aria-expanded="false" aria-controls="faq-collapseTwo">
+                                Where is the Lost & Found office located?
+                            </button>
+                        </h2>
+                        <div id="faq-collapseTwo" class="accordion-collapse collapse" aria-labelledby="faq-headingTwo" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Our main office is located in the <strong>Student Affairs building, Room 101</strong>. We are open from 9:00 AM to 5:00 PM, Monday to Friday.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq-headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-collapseThree" aria-expanded="false" aria-controls="faq-collapseThree">
+                                What do I need to bring to claim my item?
+                            </button>
+                        </h2>
+                        <div id="faq-collapseThree" class="accordion-collapse collapse" aria-labelledby="faq-headingThree" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Please bring your <strong>University ID</strong>. You will also need to provide a detailed description of the item to verify ownership.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 </section>
 
