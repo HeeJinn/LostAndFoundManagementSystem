@@ -26,19 +26,18 @@ $twig->addGlobal('current_route', $route);
 switch ($route) {
     case '/':
     case '/home':
-        $name = "paul";
-        $items = $conn->query("SELECT * FROM item");
+        echo $twig->render('home.html.twig');
+        break; 
+
+    case '/lostitems':
+
+                $items = $conn->query("SELECT * FROM item");
         $items->execute();
         $allItems = $items->fetchAll(PDO::FETCH_OBJ);
 
         echo $twig->render('forum.html.twig', [
             'items' => $allItems,
-            'name' => $name
         ]);
-        break; 
-
-    case '/link':
-        echo $twig->render('link.html.twig');
         break; 
 
     default:

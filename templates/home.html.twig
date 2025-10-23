@@ -1,0 +1,56 @@
+{% extends "base.html.twig" %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block content %}
+<section id="booksCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#booksCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#booksCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#booksCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    </div>
+    <div class="carousel-inner">
+        <div class="carousel-item active c-item">
+            <img src="https://images-origin.wallwiz.link/5892130a918ad00001dcef7a_1" class="d-block w-100 c-img" alt="...">
+            <div class="carousel-caption top-0 mt-4">
+                <p class="fs-3 mt-5 text-uppercase">Where Lost Items Meet Their Owners</p>
+                <h1 class="display-1 fw-bolder text-capitalize">UPANG Lost and Found</h1>
+            </div>
+        </div>
+
+        <div class="carousel-item c-item">
+            <img src="https://png.pngtree.com/background/20230528/original/pngtree-table-is-standing-with-a-lot-of-different-items-picture-image_2782057.jpg" class="d-block w-100 c-img" alt="...">
+            <div class="carousel-caption top-0 mt-4">
+                <p class="fs-3 mt-5 text-uppercase">Bringing Lost Treasures Back Home</p>
+                <h1 class="display-1 fw-bolder text-capitalize">Reclaim What's Yours</h1>
+            </div>
+        </div>
+
+        <div class="carousel-item c-item">
+            <img src="https://img.freepik.com/premium-photo/frame-by-school-supplies-black-background-top-view-space-text_547271-4860.jpg" class="d-block w-100 c-img" alt="...">
+            <div class="carousel-caption top-0 mt-4">
+                <p class="fs-3 mt-5 text-uppercase">Connecting Finders with Owners Instantly</p>
+                <h1 class="display-1 fw-bolder text-capitalize">Make a Connection</h1>
+            </div>
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#booksCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#booksCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</section>
+<section>
+    <div class="container py-5">
+        <div class="text-center">Tangina diko alam ilalagay sa baba Home page, pic nalang kaya naten></div>
+    </div>
+</section>
+
+
+
+{% endblock %}
