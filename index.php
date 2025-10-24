@@ -46,6 +46,13 @@ switch ($route) {
         ]);
         break;
 
+    case '/viewitem':
+
+        echo $twig->render('viewitem.html.twig', [
+
+        ]);
+        break;
+
     default:
         http_response_code(404);
         // It's better to render a real 404 page
