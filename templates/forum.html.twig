@@ -5,8 +5,8 @@ Lost and Found Forum
 {% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <h3><i class="bi bi-file-earmark-medical px-2"></i>List of lost items</h3>
+<div class="container-fluid py-4 px-5">
+    <h3><i class="bi bi-file-earmark-medical-fill px-2"></i>List of lost items</h3>
 
     <div class="row g-3 align-items-center my-3">
         <div class="col">
@@ -20,7 +20,6 @@ Lost and Found Forum
         <div class="col-12 col-md-auto">
             <div class="dropdown d-grid">
                 <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    {# THE FIX: The initial text is now the default category #}
                     <span id="filter-button-label">All Categories</span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">

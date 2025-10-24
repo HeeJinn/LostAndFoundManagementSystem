@@ -5,7 +5,99 @@ Report Item
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1>Report Item page</h1>
+<div class="container-fluid py-4 px-5">
+    <h3><i class="bi bi-exclamation-diamond-fill px-3"></i>Report Item</h3>
+    <hr>
+    <div class="card p-4 p-md-5 shadow-sm">
+        <form action="">
+            <div class="row">
+
+                <div class="col-lg-5">
+                    <div class="mb-4">
+                        <label for="itemImage" class="form-label">Item Image</label>
+                        <div class="text-center p-3 border rounded bg-light" style="min-height: 200px; display: grid; place-content: center;">
+                            <i class="bi bi-image" style="font-size: 3rem; color: #ccc;"></i>
+                            <p class="text-muted small mt-2">Image preview</p>
+                        </div>
+                        <input class="form-control mt-2" type="file" id="itemImage">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label d-block mb-2">Status</label>
+                        <div>
+                            <input type="radio" class="btn-check" name="itemStatus" id="status-found" value="found" autocomplete="off" checked>
+                            <label class="btn btn-outline-success" for="status-found"><i class="bi bi-check-circle-fill pe-1"></i>Found</label>
+
+                            <input type="radio" class="btn-check" name="itemStatus" id="status-claimed" value="claimed" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="status-claimed"><i class="bi bi-flag-fill pe-1"></i>Claimed</label>
+
+                            <input type="radio" class="btn-check" name="itemStatus" id="status-archived" value="archived" autocomplete="off">
+                            <label class="btn btn-outline-secondary" for="status-archived"><i class="bi bi-archive-fill pe-1"></i>Archived</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="mb-3">
+                        <label for="item_name" class="form-label">Item name</label>
+                        <input type="text" class="form-control" id="item_name" placeholder="Enter item name">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="item_description" class="form-label">Item description</label>
+                        <textarea class="form-control" id="item_description" rows="3" placeholder="Provide details like brand, color, or any unique marks..."></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="category" class="form-label">Categories</label>
+                            <select class="form-select" id="category">
+                                <option selected>Choose...</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="books">Books & Notes</option>
+                                <option value="clothing">Clothing</option>
+                                <option value="ids">IDs & Cards</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="location_found" class="form-label">Location Found</label>
+                            <input type="text" class="form-control" id="location_found" placeholder="e.g., University Library">
+                        </div>
+                    </div>
+
+                    <hr class="my-3">
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="first_name" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="first_name" placeholder="Enter First Name">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="last_name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="last_name" placeholder="Enter Last Name">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="student_id" class="form-label">Student ID</label>
+                            <input type="number" class="form-control" id="student_id" placeholder="Enter student id">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" placeholder="Enter email">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="contact_number" class="form-label">Contact Number</label>
+                            <input type="number" class="form-control" id="contact_number" placeholder="Enter contact number">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-primary btn-lg">Add Report</button>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}
