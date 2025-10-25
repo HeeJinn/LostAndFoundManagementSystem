@@ -8,95 +8,101 @@ Lost and Found Forum
 <div class="container-fluid py-4 px-5">
     <h3><i class="bi bi-file-earmark-medical-fill px-2"></i>List of lost items</h3>
 
-    <div class="row g-3 align-items-center my-3">
-        <div class="col">
-            <form action="">
+    {# ======================================================= #}
+    {# == SEARCH & FILTER FORM (for standard GET submission) == #}
+    {# ======================================================= #}
+    <form method="GET" action="{{ BASE_PATH }}/lostitems">
+        <div class="row g-3 align-items-center my-3">
+            <!-- Search Input Column: Takes up the remaining space -->
+            <div class="col">
                 <div class="input-group">
                     <span class="input-group-text bg-primary text-light" id="search-item"><i class="bi bi-search"></i></span>
-                    <input type="text" id="searchInput" class="form-control" placeholder="Search for an item..." aria-label="Search" aria-describedby="search-item">
+                    {# Added name="search_query" #}
+                    <input type="text" id="searchInput" name="search_query" class="form-control" placeholder="Search for an item..." aria-label="Search" aria-describedby="search-item">
                 </div>
-            </form>
-        </div>
-        <div class="col-12 col-md-auto">
-            <div class="dropdown d-grid">
-                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <span id="filter-button-label">All Categories</span>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item filter-option" href="#" data-category="all">All Categories</a></li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li><a class="dropdown-item filter-option" href="#" data-category="electronics">Electronics</a></li>
-                    <li><a class="dropdown-item filter-option" href="#" data-category="books">Books & Notes</a></li>
-                    <li><a class="dropdown-item filter-option" href="#" data-category="clothing">Clothing</a></li>
-                    <li><a class="dropdown-item filter-option" href="#" data-category="ids">IDs & Cards</a></li>
-                </ul>
+            </div>
+            <!-- Filter Select Column: Auto-width -->
+            <div class="col-12 col-md-auto">
+                 {# Replaced dropdown with form-select #}
+                <select class="form-select" id="categoryFilter" name="category_filter" aria-label="Filter by category">
+                    <option value="all" selected>All Categories</option> 
+                    <option value="electronics">Electronics</option>
+                    <option value="books">Books & Notes</option>
+                    <option value="clothing">Clothing</option>
+                    <option value="ids">IDs & Cards</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <!-- Submit Button Column: Auto-width -->
+            <div class="col-12 col-md-auto">
+                {# Added a submit button #}
+                <button type="submit" class="btn btn-primary w-100">Filter / Search</button> 
             </div>
         </div>
-    </div>
+    </form>
+    {# ======================================================= #}
+    {# == END SEARCH & FILTER FORM == #}
+    {# ======================================================= #}
 
 
-    <div class="row justify-content-center g-4 pt-3">
+    <div class="row justify-content-start g-4 pt-3"> {# Changed justify-content-center to start #}
         {% if items is not empty %}
-        {% for item in items %}
-        <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card h-100 shadow border-0">
-                <div class="card-img-container ratio ratio-4x3">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFCNoTGDEmzsx5o-Od7WDRwyi7pISwBwyJSw&s" class="card-img-top" alt="Item Image">
+            {% for item in items %}
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                <div class="card h-100 shadow border-0">
+                    <div class="card-img-container ratio ratio-4x3">
+                        <img src="{{ item.item_image_url | default('https://placehold.co/400x300/6c757d/FFFFFF?text=No+Image') }}" class="card-img-top" alt="{{ item.item_name }}">
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ item.item_name }}</h5>
+                        <p class="card-text text-muted small m-0 p-0">
+                            Category: <strong>{{ item.category_name | default('N/A') }}</strong>
+                        </p>
+                        <p class="card-text text-muted small m-0 p-0">
+                             Reporter ID: <strong>{{ item.student_id | default('N/A') }}</strong>
+                        </p>
+                        <p class="card-text text-muted small">
+                            Reported: <strong>{{ item.reported_at | date("M j, Y g:i a") }}</strong> 
+                        </p>
+                        <a href="{{ BASE_PATH }}/viewitem?id={{ item.id }}" class="btn btn-primary w-100 mt-auto">View Details</a>
+                    </div>
                 </div>
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">{{ item.item_name }}</h5>
-                    <p class="card-text text-muted small">Student ID: {{ item.student_id }}</p>
-                    <a href="{{ BASE_PATH }}/viewitem?id={{ item.id }}" class="btn btn-primary w-100 mt-auto">View Details</a>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
+            </div>  
+            {% endfor %}
         {% else %}
-        <div class="col-12 text-center">
-            <p class="text-muted">No items found.</p>
-        </div>
+            <div class="col-12 text-center">
+                <p class="text-muted">No items found.</p>
+            </div>
         {% endif %}
     </div>
 
 
+
     <nav aria-label="Page navigation">
         <ul class="pagination justify-content-center mt-4">
-            <li class="page-item disabled"><a href="#" class="page-link">Previous</a></li>
-            <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+
+            <li class="page-item {% if currentPage == 1 %} disabled {% endif %}">
+                <a href="{{ BASE_PATH }}/lostitems?page={{ currentPage - 1 }}" class="page-link">Previous</a>
+            </li>
+
+            {% for i in 1..totalPages %}
+                <li class="page-item {% if i == currentPage %} active {% endif %}" {% if i == currentPage %} aria-current="page" {% endif %}>
+                    <a class="page-link" href="{{ BASE_PATH }}/lostitems?page={{ i }}">{{ i }}</a>
+                </li>
+            {% endfor %}
+            
+            <li class="page-item {% if currentPage == totalPages %} disabled {% endif %}">
+                <a class="page-link" href="{{ BASE_PATH }}/lostitems?page={{ currentPage + 1 }}">Next</a>
+            </li>
+
         </ul>
     </nav>
+
+    {# End Pagination #}
+    
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const filterButtonLabel = document.getElementById('filter-button-label');
-        const filterOptions = document.querySelectorAll('.filter-option');
-
-        filterOptions.forEach(option => {
-            option.addEventListener('click', function(event) {
-                // Prevent the link from navigating
-                event.preventDefault();
-
-                // Get the text from the clicked item (e.g., "Electronics")
-                const selectedCategoryText = this.textContent;
-
-                // Get the category value for your AJAX call
-                const selectedCategoryValue = this.dataset.category;
-
-                // Update the button's text
-                filterButtonLabel.textContent = selectedCategoryText;
-
-                // You can now use selectedCategoryValue in your AJAX request
-                console.log('Selected category:', selectedCategoryValue);
-                // Example: performAjaxSearch(document.getElementById('searchInput').value, selectedCategoryValue);
-            });
-        });
-    });
-</script>
+{# Removed the JavaScript block as requested #}
 
 {% endblock %}
+

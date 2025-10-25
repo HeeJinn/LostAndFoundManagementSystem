@@ -1,6 +1,6 @@
 <?php
 define("HOST", "localhost");
-define("DBNAME", "lostandfoud_db");
+define("DBNAME", "lostandfound_db");
 define("USER", "root");
 define("PASS", "");
 
