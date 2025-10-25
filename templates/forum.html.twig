@@ -48,7 +48,7 @@ Lost and Found Forum
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">{{ item.item_name }}</h5>
                     <p class="card-text text-muted small">Student ID: {{ item.student_id }}</p>
-                    <a href="#" class="btn btn-primary w-100 mt-auto">View Details</a>
+                    <a href="{{ BASE_PATH }}/viewitem?id={{ item.id }}" class="btn btn-primary w-100 mt-auto">View Details</a>
                 </div>
             </div>
         </div>

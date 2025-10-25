@@ -27,7 +27,7 @@ switch ($route) {
     case '/':
     case '/home':
         echo $twig->render('home.html.twig');
-        break; 
+        break;
 
     case '/lostitems':
         $items = $conn->query("SELECT * FROM item");
@@ -41,22 +41,41 @@ switch ($route) {
 
     case '/reportitem':
 
-        echo $twig->render('reportitem.html.twig', [
-        
-        ]);
+        echo $twig->render('reportitem.html.twig', []);
         break;
 
     case '/viewitem':
+        $itemId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
-        echo $twig->render('viewitem.html.twig', [
+        if (!$itemId) {
+            http_response_code(404);
+            echo $twig->render('404.html.twig');
+            break; 
+        }
 
-        ]);
+        try {
+            $stmt = $conn->prepare("SELECT * FROM item WHERE id = :id");
+            $stmt->execute([':id' => $itemId]);
+            $item = $stmt->fetch(PDO::FETCH_OBJ);
+
+            if ($item) {
+                echo $twig->render('viewitem.html.twig', [
+                    'item' => $item 
+                ]);
+            } else {
+                http_response_code(404);
+                echo $twig->render('404.html.twig');
+            }
+        } catch (PDOException $e) {
+
+            error_log("Database Error: " . $e->getMessage());
+            http_response_code(500); 
+            echo $twig->render('error.html.twig', ['message' => 'Could not retrieve item details.']);
+        }
         break;
 
     default:
         http_response_code(404);
-        // It's better to render a real 404 page
         echo $twig->render('404.html.twig');
         break;
 }
-?>
