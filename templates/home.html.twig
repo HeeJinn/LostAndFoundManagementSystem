@@ -67,63 +67,38 @@ Home
     <div class="container">
         <div class="text-center mb-5">
             <h2 class="fw-bold">Latest Finds</h2>
-            <p class="text-muted">Here are some of the most recent items turned in to the L&F office.</p>
+            <p class="text-muted">Here are some of the most recent items turned in.</p>
         </div>
+
         <div class="row">
-
-            <div class="col-lg-3 col-md-6 mb-4">
+            {% if recentItems is not empty %}
+            {% for item in recentItems %}
+            <div class="col-12 col-sm-6 col-md-6 col-lg-3 mb-4">
                 <div class="card h-100 shadow border-0">
                     <div class="card-img-container ratio ratio-4x3">
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0G3zTzVOk6Y-G9rtoh0a4XtFxNbkTWYFG7w&s" class="card-img-top" alt="Black Wallet">
+                        <img src="{{ item.item_image_url | default('https://placehold.co/400x300/6c757d/FFFFFF?text=No+Image') }}" class="card-img-top" alt="{{ item.item_name }}">
                     </div>
                     <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">Black Leather Wallet</h5>
-                        <p class="card-text text-muted small">Found near the library on Oct 22, 2025.</p>
-                        <a href="#" class="btn btn-primary w-100 mt-auto">View Details</a>
+                        <h5 class="card-title">{{ item.item_name }}</h5>
+                        <p class="card-text text-muted small">
+                            Found: {{ item.found_location | default('N/A') }} <br>
+                            Reported: {{ item.reported_at | date("M j, Y") }}
+                        </p>
+                        <a href="{{ BASE_PATH }}/viewitem?id={{ item.id }}" class="btn btn-primary w-100 mt-auto">View Details</a>
                     </div>
                 </div>
             </div>
-
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="card h-100 shadow border-0">
-                    <div class="card-img-container ratio ratio-4x3">
-                        <img src="https://media.wired.com/photos/67eda015bf140512fa8f50e5/4:3/w_640%2Cc_limit/Davek-Solo-Umbrella-Reviewer-Photo-SOURCE-Julian-Chokkattu-(no-border).jpg" class="card-img-top" alt="Blue Umbrella">
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">Blue Umbrella</h5>
-                        <p class="card-text text-muted small">Found in the cafeteria on Oct 21, 2025.</p>
-                        <a href="#" class="btn btn-primary w-100 mt-auto">View Details</a>
-                    </div>
-                </div>
+            {% endfor %}
+            {% else %}
+            <div class="col-12 text-center">
+                <p class="text-muted">No recent items found.</p>
+                {% if error_message is defined %}
+                <p class="text-danger">{{ error_message }}</p>
+                {% endif %}
             </div>
-
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="card h-100 shadow border-0">
-                    <div class="card-img-container ratio ratio-4x3">
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUOOruC7lHjX3SqoVrlgP_xCnfNCtjs59jhw&s" class="card-img-top" alt="University ID">
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">University ID Card</h5>
-                        <p class="card-text text-muted small">Found in the main hall on Oct 20, 2025.</p>
-                        <a href="#" class="btn btn-primary w-100 mt-auto">View Details</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="card h-100 shadow border-0">
-                    <div class="card-img-container ratio ratio-4x3">
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFCNoTGDEmzsx5o-Od7WDRwyi7pISwBwyJSw&s" class="card-img-top" alt="Wireless Earbuds">
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">Wireless Earbuds</h5>
-                        <p class="card-text text-muted small">Found in the gym on Oct 19, 2025.</p>
-                        <a href="#" class="btn btn-primary w-100 mt-auto">View Details</a>
-                    </div>
-                </div>
-            </div>
-
+            {% endif %}
         </div>
+
     </div>
 </section>
 

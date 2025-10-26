@@ -5,26 +5,45 @@ Report Item
 {% endblock %}
 
 {% block content %}
+
 <div class="container-fluid py-4 px-5">
     <h3><i class="bi bi-exclamation-diamond-fill px-3"></i>Report Item</h3>
     <hr>
     <div class="card p-4 p-md-5 shadow-sm">
-        <form action="">
+        {# MODIFICATION 1: Updated form tag #}
+        {% if errors is defined and errors is not empty %}
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Please fix the following errors:</h4>
+            <ul>
+                {% for error in errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        <form method="POST" action="{{ BASE_PATH }}/reportitem" enctype="multipart/form-data">
             <div class="row">
 
                 <div class="col-lg-5">
                     <div class="mb-4">
-                        <label for="itemImage" class="form-label">Item Image</label>
-                        <div class="text-center p-3 border rounded bg-light" style="min-height: 200px; display: grid; place-content: center;">
-                            <i class="bi bi-image" style="font-size: 3rem; color: #ccc;"></i>
-                            <p class="text-muted small mt-2">Image preview</p>
+                        <label for="itemImageInput" class="form-label">Item Image</label>
+                        {# Image Preview Area #}
+                        <div class="text-center p-3 border rounded bg-light mb-2" style="height: 250px; display: grid; place-content: center;">
+                            <img id="imagePreview" src="#" alt="Image Preview" class="img-fluid rounded" style="display: none; max-height: 230px; object-fit: contain;">
+                            <div id="imagePlaceholder">
+                                <i class="bi bi-image" style="font-size: 3rem; color: #ccc;"></i>
+                                <p class="text-muted small mt-2">Select an image</p>
+                            </div>
                         </div>
-                        <input class="form-control mt-2" type="file" id="itemImage">
+                        {# MODIFICATION 2: Added name="itemImage" #}
+                        <input class="form-control" type="file" id="itemImageInput" name="itemImage" accept="image/png, image/jpeg, image/gif" required>
+                        <div class="form-text">Accepted formats: JPG, PNG, GIF. Max size: 2MB.</div>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label d-block mb-2">Status</label>
                         <div>
+                            {# MODIFICATION 3: Added name="itemStatus" (already correct) #}
                             <input type="radio" class="btn-check" name="itemStatus" id="status-found" value="found" autocomplete="off" checked>
                             <label class="btn btn-outline-success" for="status-found"><i class="bi bi-check-circle-fill pe-1"></i>Found</label>
 
@@ -40,53 +59,65 @@ Report Item
                 <div class="col-lg-7">
                     <div class="mb-3">
                         <label for="item_name" class="form-label">Item name</label>
-                        <input type="text" class="form-control" id="item_name" placeholder="Enter item name">
+                        {# MODIFICATION 4: Added name="item_name" #}
+                        <input type="text" class="form-control" id="item_name" name="item_name" placeholder="Enter item name" required>
                     </div>
 
                     <div class="mb-3">
                         <label for="item_description" class="form-label">Item description</label>
-                        <textarea class="form-control" id="item_description" rows="3" placeholder="Provide details like brand, color, or any unique marks..."></textarea>
+                        {# MODIFICATION 5: Added name="item_description" #}
+                        <textarea class="form-control" id="item_description" name="item_description" rows="3" placeholder="Provide details like brand, color, or any unique marks..." required></textarea>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="category" class="form-label">Categories</label>
-                            <select class="form-select" id="category">
-                                <option selected>Choose...</option>
-                                <option value="electronics">Electronics</option>
-                                <option value="books">Books & Notes</option>
-                                <option value="clothing">Clothing</option>
-                                <option value="ids">IDs & Cards</option>
+                            <label for="category" class="form-label">Category</label>
+                            {# MODIFICATION 6: Added name="category" #}
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="" selected disabled>Choose...</option>
+                                {# Assuming category IDs from previous steps #}
+                                <option value="1">Electronics</option>
+                                <option value="2">Books & Notes</option>
+                                <option value="3">Clothing</option>
+                                <option value="4">IDs & Cards</option>
+                                <option value="5">Other</option>
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="location_found" class="form-label">Location Found</label>
-                            <input type="text" class="form-control" id="location_found" placeholder="e.g., University Library">
+                            {# MODIFICATION 7: Added name="location_found" #}
+                            <input type="text" class="form-control" id="location_found" name="location_found" placeholder="e.g., University Library" required>
                         </div>
                     </div>
 
                     <hr class="my-3">
+                    <h5 class="mb-3">Reporter Information</h5>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="first_name" class="form-label">First Name</label>
-                            <input type="text" class="form-control" id="first_name" placeholder="Enter First Name">
+                            {# MODIFICATION 8: Added name="first_name" #}
+                            <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Enter First Name" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="last_name" class="form-label">Last Name</label>
-                            <input type="text" class="form-control" id="last_name" placeholder="Enter Last Name">
+                            {# MODIFICATION 9: Added name="last_name" #}
+                            <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Enter Last Name" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="student_id" class="form-label">Student ID</label>
-                            <input type="number" class="form-control" id="student_id" placeholder="Enter student id">
+                            {# MODIFICATION 10: Added name="student_id" #}
+                            <input type="text" class="form-control" id="student_id" name="student_id" placeholder="Enter student id" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" placeholder="Enter email">
+                            {# MODIFICATION 11: Added name="email" #}
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="contact_number" class="form-label">Contact Number</label>
-                            <input type="number" class="form-control" id="contact_number" placeholder="Enter contact number">
+                            {# MODIFICATION 12: Added name="contact_number" #}
+                            <input type="tel" class="form-control" id="contact_number" name="contact_number" placeholder="Enter contact number" required>
                         </div>
                     </div>
                 </div>
@@ -100,4 +131,28 @@ Report Item
         </form>
     </div>
 </div>
+
+{# MODIFICATION 13: Added JavaScript for Image Preview #}
+<script>
+    const itemImageInput = document.getElementById('itemImageInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const imagePlaceholder = document.getElementById('imagePlaceholder');
+
+    itemImageInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+                imagePlaceholder.style.display = 'none';
+            }
+            reader.readAsDataURL(file);
+        } else {
+            imagePreview.src = '#';
+            imagePreview.style.display = 'none';
+            imagePlaceholder.style.display = 'block';
+        }
+    });
+</script>
 {% endblock %}
