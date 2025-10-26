@@ -31,19 +31,17 @@ switch ($route) {
 
     case '/lostitems':
         try {
-            // --- Get Parameters (Search, Filter, Page) ---
             $itemsPerPage = 12;
             $currentPage = max(1, filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT) ?: 1);
-            // Sanitize search and filter inputs
+           
             $searchTerm = trim(filter_input(INPUT_GET, 'search_query', FILTER_SANITIZE_STRING) ?: '');
             $category = filter_input(INPUT_GET, 'category_filter', FILTER_SANITIZE_STRING) ?: 'all';
 
-            // --- Build WHERE Clause Dynamically ---
+           
             $whereClauses = [];
-            $params = []; // Parameters for prepared statement
+            $params = []; 
 
             if (!empty($searchTerm)) {
-                // Search in item name, description, and location
                 $whereClauses[] = "(li.item_name LIKE :search OR li.item_description LIKE :search OR li.found_location LIKE :search)";
                 $params[':search'] = '%' . $searchTerm . '%';
             }
@@ -64,42 +62,39 @@ switch ($route) {
             if (!empty($whereClauses)) {
                 $whereSql = 'WHERE ' . implode(' AND ', $whereClauses);
             }
-            // --- End Building WHERE Clause ---
-
-            // --- Get Total Filtered Item Count ---
+       
             $countSql = "SELECT COUNT(*)
                          FROM lost_items li
                          LEFT JOIN categories c ON li.category_id = c.category_id
-                         {$whereSql}"; // Apply the same filters to the count
+                         {$whereSql}";
 
             $countStmt = $conn->prepare($countSql);
-            $countStmt->execute($params); // Execute count query with filter params
+            $countStmt->execute($params); 
             $totalItems = $countStmt->fetchColumn();
-            $totalPages = $totalItems > 0 ? ceil($totalItems / $itemsPerPage) : 1; // Ensure at least 1 page
+            $totalPages = $totalItems > 0 ? ceil($totalItems / $itemsPerPage) : 1;
 
-            // Ensure current page is valid after filtering and counting
+           
             $currentPage = min($currentPage, $totalPages);
-            if ($currentPage < 1) $currentPage = 1; // Recalculate if totalPages became 0 or less
+            if ($currentPage < 1) $currentPage = 1; 
             $offset = ($currentPage - 1) * $itemsPerPage;
 
-            // --- Fetch Filtered Items for Current Page ---
+           
             $sql = "SELECT li.item_id AS id, li.item_name, li.item_description, li.item_image_url,
                            li.item_status, li.found_location, li.reported_at, c.category_name,
                            r.first_name AS reporter_first_name, r.last_name AS reporter_last_name, r.student_id
                     FROM lost_items li
                     LEFT JOIN categories c ON li.category_id = c.category_id
                     LEFT JOIN reporters r ON li.reporter_id = r.reporter_id
-                    {$whereSql}  -- Apply filters
+                    {$whereSql}  
                     ORDER BY li.reported_at DESC
                     LIMIT :limit OFFSET :offset";
 
             $stmt = $conn->prepare($sql);
 
-            // Bind filter parameters (if any)
+        
             foreach ($params as $key => $val) {
                 $stmt->bindValue($key, $val);
             }
-            // Bind pagination parameters
             $stmt->bindValue(':limit', $itemsPerPage, PDO::PARAM_INT);
             $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 
@@ -114,8 +109,6 @@ switch ($route) {
 
             $itemsForCurrentPage = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-            // Render the full forum page with filtered/paginated data
-            // The 'app.request.query.get' in Twig will handle keeping form values
             echo $twig->render('forum.html.twig', [
                 'items' => $itemsForCurrentPage,
                 'currentPage' => $currentPage,
@@ -126,7 +119,7 @@ switch ($route) {
             echo $twig->render('error.html.twig', ['message' => 'An unexpected database error occurred.']);
             exit;
         }
-        break; // End /lostitems case
+        break; 
 
     case '/reportitem':
 
@@ -134,7 +127,7 @@ switch ($route) {
         break;
 
     case '/viewitem':
-        // Fetch the ID from the URL
+       
         $itemId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
         if (!$itemId) {
@@ -144,7 +137,7 @@ switch ($route) {
         }
 
         try {
-            // Query with JOINs for the single item
+           
             $sql = "SELECT
                         li.item_id AS id,
                         li.item_name,
@@ -163,7 +156,7 @@ switch ($route) {
                     LEFT JOIN
                         reporters r ON li.reporter_id = r.reporter_id
                     WHERE
-                        li.item_id = :item_id"; // Filter by the specific item_id
+                        li.item_id = :item_id"; 
 
             $stmt = $conn->prepare($sql);
             $stmt->execute([':item_id' => $itemId]);
@@ -174,7 +167,6 @@ switch ($route) {
                     'item' => $item
                 ]);
             } else {
-                // No item found with that ID
                 http_response_code(404);
                 echo $twig->render('404.html.twig');
             }
