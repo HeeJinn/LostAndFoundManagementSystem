@@ -432,76 +432,59 @@ switch ($route) {
         break;
 
     case '/admin':
-        // --- Handle POST Request (Login Attempt) ---
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username = filter_input(INPUT_POST, 'username');
             $password = filter_input(INPUT_POST, 'password');
             $rememberMe = isset($_POST['rememberMe']); // Check if checkbox was checked
 
-            // --- Static Credentials Check ---
-            // !! IMPORTANT: Use password_hash() and password_verify() in real applications !!
-            if ($username === 'admin' && $password === 'admin123') {
-                // --- Login Successful ---
-                session_regenerate_id(true); // Prevent session fixation attacks
-                $_SESSION['is_admin_logged_in'] = true;
-                $_SESSION['admin_username'] = $username; // Optionally store username
 
-                // --- Handle "Remember Me" ---
+            if ($username === 'admin' && $password === 'admin123') {
+
+                session_regenerate_id(true);
+                $_SESSION['is_admin_logged_in'] = true;
+                $_SESSION['admin_username'] = $username;
+
+
                 if ($rememberMe) {
-                    // Extend the session cookie lifetime (e.g., 30 days)
-                    $lifetime = 86400 * 30; // 30 days in seconds
+
+                    $lifetime = 86400 * 30;
                     $params = session_get_cookie_params();
                     setcookie(
-                        session_name(),                // Cookie name (usually PHPSESSID)
-                        session_id(),                  // Current session ID
-                        time() + $lifetime,            // Expiration timestamp
-                        $params["path"],               // Cookie path
-                        $params["domain"],             // Cookie domain
-                        $params["secure"],             // Use secure cookies (HTTPS)?
-                        $params["httponly"]            // Prevent JS access? (Recommended)
+                        session_name(),
+                        session_id(),
+                        time() + $lifetime,
+                        $params["path"],
+                        $params["domain"],
+                        $params["secure"],
+                        $params["httponly"]
                     );
                 }
-                // If not checked, the cookie uses the default session lifetime
-
-                // --- Redirect to Dashboard ---
                 header('Location: ' . BASE_PATH . '/admin/dashboard');
-                exit; // Stop script execution after redirect
-
+                exit;
             } else {
-                // --- Login Failed ---
                 $error = "Invalid username or password.";
-                // Re-render the login form with an error message
                 echo $twig->render("admin.html.twig", ['error' => $error]);
             }
-
-            // --- Handle GET Request (Show Login Page) ---
         } else {
-            // If user is already logged in, redirect them to the dashboard
             if (isset($_SESSION['is_admin_logged_in']) && $_SESSION['is_admin_logged_in'] === true) {
                 header('Location: ' . BASE_PATH . '/admin/dashboard');
                 exit;
             }
-            // Otherwise, show the login form
-            // Ensure admin_login.html exists in your templates folder
             echo $twig->render("admin.html.twig");
         }
-        break; // End /admin case
-
+        break;
+        
     case '/admin/dashboard':
-        // --- PROTECTED ROUTE: Check if logged in ---
         if (!isset($_SESSION['is_admin_logged_in']) || $_SESSION['is_admin_logged_in'] !== true) {
-            // Not logged in, redirect to the login page
+
             header('Location: ' . BASE_PATH . '/admin?status=auth_required'); // Optional: Add status message
             exit;
         }
 
-        // User is logged in, show the dashboard
-        // Ensure admin_dashboard.html.twig exists and is set up
         echo $twig->render("admin_dashboard.html.twig", [
             'username' => $_SESSION['admin_username'] ?? 'Admin'
         ]);
-        break; // End /admin/dashboard case
-
+        break;
     default:
         http_response_code(404);
         echo $twig->render('404.html.twig');
