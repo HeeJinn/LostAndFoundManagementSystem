@@ -1,14 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="{{BASE_PATH}}/css/admincontent.css">
+    
+    {# CSS file should be loaded in the head #}
+    <link rel="stylesheet" href="{{BASE_PATH}}/css/admincontent.css"> 
+    
     <title>{% block title %}Lost & Found Admin{% endblock %}</title>
- 
+    
+    {% block styles %}
+    <style>
+        /* Your .card-glass styles, etc., from admincontent.css should be here or in that file */
+        .card-glass {
+            background: rgba(42, 54, 68, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: none;
+        }
+        .card-glass .card-header {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+        }
+        .card-glass hr {
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .card-glass .card-title {
+            color: var(--text-color);
+        }
+        .card-glass .card-text {
+            color: var(--sidebar-link-color);
+        }
+        .card-glass .text-muted {
+            color: var(--sidebar-link-color) !important;
+        }
+        .card-glass small {
+            color: var(--sidebar-link-color);
+        }
+    </style>
+    {% endblock %}
+
+    {# Removed JavaScript block from <head> #}
 </head>
+
 <body>
 
     <div class="sidebar">
@@ -26,31 +66,61 @@
 
         <ul class="list-unstyled sidebar-nav">
             <li class="nav-item sidebar-title">Pages</li>
+            {# Dashboard Link #}
             <li class="nav-item">
-                 <a class="nav-link active" href="#"><i class="bi bi-speedometer2"></i>Overview</a>
+                <a class="nav-link {% if current_route == '/admin/dashboard' %}active{% endif %}" href="{{ BASE_PATH }}/admin/dashboard">
+                    <i class="bi bi-speedometer2"></i>Dashboard
+                </a>
             </li>
-            
-            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-box-seam"></i>Items</a></li>
-            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-tags-fill"></i>Categories</a></li>
-            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-journal-check"></i>Claims</a></li>
-            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-calendar-event"></i>Activity Log</a></li>
-
-            {# REMOVED Settings Title #}
-            {# REMOVED User Management Dropdown #}
-            
-            <li class="nav-item"><a class="nav-link" href="{{ BASE_PATH }}/logout"><i class="bi bi-box-arrow-right"></i>Logout</a></li>
+            {# Items Link #}
+            <li class="nav-item">
+                <a class="nav-link {% if current_route == '/admin/items' %}active{% endif %}" href="{{ BASE_PATH }}/admin/items">
+                    <i class="bi bi-box-seam"></i>Items
+                </a>
+            </li>
+            {# Categories Link #}
+            <li class="nav-item">
+                <a class="nav-link {% if current_route == '/admin/categories' %}active{% endif %}" href="{{ BASE_PATH }}/admin/categories">
+                    <i class="bi bi-tags-fill"></i>Categories
+                </a>
+            </li>
+            {# Claims Link #}
+            <li class="nav-item">
+                <a class="nav-link {% if current_route == '/admin/claims' %}active{% endif %}" href="{{ BASE_PATH }}/admin/claims">
+                    <i class="bi bi-journal-check"></i>Claims
+                </a>
+            </li>
+            {# Activity Log Link #}
+            <li class="nav-item">
+                <a class="nav-link {% if current_route == '/admin/activity' %}active{% endif %}" href="{{ BASE_PATH }}/admin/activity">
+                    <i class="bi bi-calendar-event"></i>Activity Log
+                </a>
+            </li>
+            {# Logout Link #}
+            <li class="nav-item">
+                <a class="nav-link" href="{{ BASE_PATH }}/logout">
+                    <i class="bi bi-box-arrow-right"></i>Logout
+                </a>
+            </li>
         </ul>
     </div>
 
     <div class="main-wrapper">
         <div class="content-area">
             {% block admin_content %}
-                
+
             {% endblock %}
         </div>
     </div>
 
+    {# --- SCRIPT TAGS MOVED HERE --- #}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    {# --- JAVASCRIPT BLOCK MOVED HERE --- #}
+    {# This is the correct location: end of <body>, after libraries #}
+    {% block javascripts %}{% endblock %}
+
 </body>
 </html>
 

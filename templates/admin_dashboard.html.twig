@@ -1,8 +1,209 @@
-{% extends "adminbase.html.twig" %}
+{% extends "adminbase.html.twig" %} 
+
 {% block title %}Admin Dashboard{% endblock %}
 
 {% block admin_content %}
+<div class="container">
+    <h1 class="h2 mb-4 dash-title">Dashboard Overview</h1>
 
+    {# Display PHP Error Message if present #}
+    {% if error_message is defined and error_message %}
+        <div class="alert alert-danger">{{ error_message }}</div>
+    {% endif %}
 
+    {# Top row of stats cards - Uses PHP Variables #}
+    <div class="row g-4 mb-4">
+        {# Card 1: Total Items #}
+        <div class="col-lg-3 col-md-6">
+             <div class="card card-glass h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="flex-shrink-0 me-3"> <i class="bi bi-box-seam display-4 text-primary"></i> </div>
+                    <div class="flex-grow-1">
+                        <p class="card-text text-muted mb-1">Total Items Logged</p>
+                        {# Use PHP Variable #}
+                        <h4 class="card-title mb-0">{{ totalItems | default(0) }}</h4>
+                    </div>
+                </div>
+                 <div class="card-footer bg-transparent border-top-0 pt-0">
+                     <small class="text-success"><i class="bi bi-arrow-up-short"></i> +5</small> <small class="text-muted">since last week</small>
+                 </div>
+            </div>
+        </div>
+        {# Card 2: Found Items #}
+        <div class="col-lg-3 col-md-6">
+             <div class="card card-glass h-100">
+                 <div class="card-body d-flex align-items-center">
+                      <div class="flex-shrink-0 me-3"> <i class="bi bi-check2-circle display-4 text-success"></i> </div>
+                      <div class="flex-grow-1">
+                          <p class="card-text text-muted mb-1">Items Currently Found</p>
+                          {# Use PHP Variable #}
+                          <h4 class="card-title mb-0">{{ foundItems | default(0) }}</h4>
+                      </div>
+                 </div>
+                  <div class="card-footer bg-transparent border-top-0 pt-0"> <small class="text-muted">Ready for pickup</small> </div>
+             </div>
+        </div>
+        {# Card 3: Claimed Items #}
+        <div class="col-lg-3 col-md-6">
+             <div class="card card-glass h-100">
+                 <div class="card-body d-flex align-items-center">
+                      <div class="flex-shrink-0 me-3"> <i class="bi bi-person-check-fill display-4 text-info"></i> </div>
+                      <div class="flex-grow-1">
+                          <p class="card-text text-muted mb-1">Items Claimed</p>
+                          {# Use PHP Variable #}
+                          <h4 class="card-title mb-0">{{ claimedItems | default(0) }}</h4>
+                      </div>
+                 </div>
+                 <div class="card-footer bg-transparent border-top-0 pt-0"> <small class="text-success"><i class="bi bi-arrow-up-short"></i> +2</small> <small class="text-muted">this week</small> </div>
+             </div>
+        </div>
+        {# Card 4: Archived Items #}
+        <div class="col-lg-3 col-md-6">
+             <div class="card card-glass h-100">
+                 <div class="card-body d-flex align-items-center">
+                      <div class="flex-shrink-0 me-3"> <i class="bi bi-archive-fill display-4 text-secondary"></i> </div>
+                      <div class="flex-grow-1">
+                          <p class="card-text text-muted mb-1">Items Archived</p>
+                          {# Use PHP Variable #}
+                          <h4 class="card-title mb-0">{{ archivedItems | default(0) }}</h4>
+                      </div>
+                 </div>
+                 <div class="card-footer bg-transparent border-top-0 pt-0"> <small class="text-muted">Older than 90 days</small> </div>
+             </div>
+        </div>
+    </div> {# End Stats Row #}
+
+    {# CHART SECTION #}
+    <div class="row g-4">
+        {# Chart 1: Item Status Distribution #}
+        <div class="col-lg-4 col-md-6">
+            <div class="card card-glass h-100">
+                <div class="card-header">Item Status Distribution</div>
+                <div class="card-body d-flex justify-content-center align-items-center">
+                    <canvas id="statusPieChart" style="max-width: 100%; height: 250px;"></canvas>
+                </div>
+            </div>
+        </div>
+        {# Chart 2: Items Reported Monthly #}
+        <div class="col-lg-8 col-md-6">
+            <div class="card card-glass h-100">
+                <div class="card-header">Items Reported Monthly</div>
+                <div class="card-body">
+                    <canvas id="monthlyReportsChart" style="max-width: 100%; height: 250px;"></canvas>
+                </div>
+            </div>
+        </div>
+        {# Chart 3: Items per Category #}
+         <div class="col-12">
+             <div class="card card-glass">
+                 <div class="card-header">Items by Category</div>
+                 <div class="card-body">
+                     <canvas id="categoryBarChart" style="max-width: 100%; height: 250px;"></canvas>
+                 </div>
+             </div>
+         </div>
+    </div> {# End Chart Row #}
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }} {# IMPORTANT: Make sure Chart.js is loaded in base AFTER jQuery/Popper but BEFORE this block #}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Wrapper function to safely parse JSON passed from Twig/PHP
+        function safeJsonParse(jsonString, defaultVal = { labels: [], data: [] }) { // Default to object structure
+            try {
+                 if (!jsonString || typeof jsonString !== 'string' || jsonString.trim() === '' || jsonString.trim().toLowerCase() === 'null' || jsonString.trim().toLowerCase() === 'undefined') {
+                    console.warn("Received empty or invalid JSON string for chart, using default:", defaultVal, "Input:", jsonString);
+                    return defaultVal;
+                 }
+                // Decode HTML entities that might still be present
+                const decodedString = ((str) => {
+                    const txt = document.createElement("textarea");
+                    txt.innerHTML = str;
+                    return txt.value;
+                })(jsonString);
+
+                const parsed = JSON.parse(decodedString); // Parse the decoded string
+                 if (typeof parsed !== 'object' || !Array.isArray(parsed.labels) || !Array.isArray(parsed.data)) {
+                    console.warn("Parsed JSON does not have expected {labels: [], data: []} structure, using default:", defaultVal, "Parsed:", parsed);
+                    return defaultVal;
+                 }
+                return parsed;
+            } catch (error) {
+                console.error("Failed to parse JSON for chart:", error, "Input string:", jsonString);
+                return defaultVal; // Return default on error
+            }
+        }
+
+        // --- Get Data Passed from PHP ---
+        // Use the safe parser with appropriate defaults
+        // Using '| raw' only, assuming json_encode flags handle JS safety
+        const statusChartData = safeJsonParse('{{ statusChartJson | raw | default('{}') }}');
+        const monthlyChartData = safeJsonParse('{{ monthlyChartJson | raw | default('{}') }}');
+        const categoryChartData = safeJsonParse('{{ categoryChartJson | raw | default('{}') }}');
+        
+        // Log parsed data for debugging
+        console.log("Status Data:", statusChartData);
+        console.log("Monthly Data:", monthlyChartData);
+        console.log("Category Data:", categoryChartData);
+
+        // --- Chart Colors & Config ---
+        const colorPrimary = 'rgba(54, 162, 235, 0.7)'; const colorSuccess = 'rgba(75, 192, 192, 0.7)'; const colorInfo = 'rgba(153, 102, 255, 0.7)'; const colorWarning = 'rgba(255, 159, 64, 0.7)'; const colorDanger = 'rgba(255, 99, 132, 0.7)'; const colorSecondary = 'rgba(150, 150, 150, 0.8)';
+        const colorPrimarySolid = 'rgb(54, 162, 235)'; const colorSuccessSolid = 'rgb(75, 192, 192)'; const colorWarningSolid = 'rgb(255, 159, 64)'; const colorDangerSolid = 'rgb(255, 99, 132)'; const colorSecondarySolid = 'rgb(150, 150, 150)';
+        const textColor = '#E2E8F0'; const gridColor = 'rgba(255, 255, 255, 0.1)'; const tooltipBgColor = 'rgba(34, 43, 56, 0.9)'; const cardBgColor = 'rgba(42, 54, 68, 0.85)';
+        Chart.defaults.color = textColor; Chart.defaults.borderColor = gridColor;
+
+        // Function to display "No data" message on a canvas
+        function displayNoData(canvasId) {
+             const canvas = document.getElementById(canvasId);
+             if (canvas) {
+                 const ctx = canvas.getContext('2d');
+                 ctx.save(); ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = textColor; ctx.font = '16px sans-serif'; ctx.fillText('No data available', canvas.width / 2, canvas.height / 2); ctx.restore();
+             }
+        }
+
+        // --- 1. Status Doughnut Chart ---
+        const statusCtx = document.getElementById('statusPieChart');
+        if (statusCtx && statusChartData && Array.isArray(statusChartData.labels) && Array.isArray(statusChartData.data) && statusChartData.labels.length > 0) { // Check labels length too
+            const statusDataSum = statusChartData.data.reduce((a, b) => a + (b || 0), 0); // Handle potential nulls/undefined in data
+             if (statusDataSum === 0) {
+                 console.warn("Status chart data sum is zero.");
+                 displayNoData('statusPieChart');
+             } else {
+                new Chart(statusCtx, { type: 'doughnut', data: { labels: statusChartData.labels, datasets: [{ label: 'Item Status', data: statusChartData.data, backgroundColor: [colorSuccess, colorPrimary, colorSecondary], borderColor: cardBgColor, borderWidth: 3, hoverOffset: 10, hoverBorderColor: 'rgba(255, 255, 255, 0.5)', hoverBorderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { color: textColor, padding: 25, usePointStyle: true, pointStyle: 'circle'}}, title: { display: false }, tooltip: { backgroundColor: tooltipBgColor, titleColor: textColor, bodyColor: textColor, borderColor: gridColor, borderWidth: 1, padding: 12, cornerRadius: 6, usePointStyle: true, callbacks: { label: function(c){let l=c.label||'';if(l)l+=': ';if(c.parsed!==null){const t=c.chart.data.datasets[0].data.reduce((a,b)=>(a||0)+(b||0),0);const p=t>0?Math.round((c.parsed/t)*100):0;l+=c.formattedValue+` (${p}%)`;}return l;}}}}} });
+            }
+        } else if (statusCtx) {
+             console.error("Status chart cannot be rendered. Canvas found, but data is invalid or empty:", statusChartData);
+             displayNoData('statusPieChart');
+        }
+
+        // --- 2. Monthly Reports Chart ---
+        const monthlyCtx = document.getElementById('monthlyReportsChart');
+        if (monthlyCtx && monthlyChartData && Array.isArray(monthlyChartData.labels) && Array.isArray(monthlyChartData.data) && monthlyChartData.labels.length > 0) { // Check labels length
+             const createGradient=(c,r)=>{const n=c.createLinearGradient(0,0,0,c.canvas.clientHeight);n.addColorStop(0,r.replace("0.7","0.4"));n.addColorStop(1,r.replace("0.7","0.05"));return n};
+             const chartCtx = monthlyCtx.getContext('2d'); const gradientFill = createGradient(chartCtx, colorPrimary);
+            new Chart(monthlyCtx, { type: 'line', data: { labels: monthlyChartData.labels, datasets: [{ label: 'Items Reported', data: monthlyChartData.data, fill: true, backgroundColor: gradientFill, borderColor: colorPrimarySolid, borderWidth: 2, pointBackgroundColor: colorPrimarySolid, pointBorderColor: '#fff', pointHoverBackgroundColor: '#fff', pointHoverBorderColor: colorPrimarySolid, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { color: textColor, padding: 10 }, grid: { color: gridColor } }, x: { ticks: { color: textColor, padding: 10 }, grid: { color: 'transparent' } } }, plugins: { legend: { display: false }, title: { display: false }, tooltip: { backgroundColor: tooltipBgColor, titleColor: textColor, bodyColor: textColor, borderColor: gridColor, borderWidth: 1, padding: 10, cornerRadius: 4, mode: 'index', intersect: false,}}, interaction: { mode: 'nearest', axis: 'x', intersect: false }}});
+        } else if (monthlyCtx) {
+             console.error("Monthly chart cannot be rendered. Canvas found, but data is invalid or empty:", monthlyChartData);
+             displayNoData('monthlyReportsChart');
+        }
+
+        // --- 3. Category Horizontal Bar Chart ---
+        const categoryCtx = document.getElementById('categoryBarChart');
+        if (categoryCtx && categoryChartData && Array.isArray(categoryChartData.labels) && Array.isArray(categoryChartData.data) && categoryChartData.labels.length > 0) { // Check labels length
+             const chartCtx = categoryCtx.getContext('2d'); const createBarGradient=(c,r)=>{const n=c.createLinearGradient(0,0,c.canvas.clientWidth,0);n.addColorStop(0,r.replace("0.7","0.2"));n.addColorStop(1,r.replace("0.7","0.8"));return n};
+            const categoryColors = [colorPrimary, colorSuccess, colorWarning, colorDanger, colorSecondary, colorInfo];
+            const categorySolidColors = [colorPrimarySolid, colorSuccessSolid, colorWarningSolid, colorDangerSolid, colorSecondarySolid, colorInfo];
+            const backgroundColors = categoryChartData.labels.map((_, i) => createBarGradient(chartCtx, categoryColors[i % categoryColors.length]));
+            const borderColors = categoryChartData.labels.map((_, i) => categorySolidColors[i % categorySolidColors.length]);
+            new Chart(categoryCtx, { type: 'bar', data: { labels: categoryChartData.labels, datasets: [{ label: '# of Items', data: categoryChartData.data, backgroundColor: backgroundColors, borderColor: borderColors, borderWidth: 1, borderRadius: 4, borderSkipped: false, }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: textColor, padding: 10 }, grid: { display: false } }, x: { ticks: { color: textColor, padding: 10 }, grid: { color: gridColor } } }, plugins: { legend: { display: false }, title: { display: false }, tooltip: { backgroundColor: tooltipBgColor, titleColor: textColor, bodyColor: textColor, borderColor: gridColor, borderWidth: 1, padding: 10, cornerRadius: 4, }}}});
+         } else if (categoryCtx) {
+              console.error("Category chart cannot be rendered. Canvas found, but data is invalid or empty:", categoryChartData);
+              displayNoData('categoryBarChart');
+         }
+    }); // End DOMContentLoaded
+</script>
 {% endblock %}
 

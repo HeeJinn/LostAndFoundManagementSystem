@@ -1,0 +1,410 @@
+{% extends "adminbase.html.twig" %} {# Ensure this matches your base template file name #}
+
+{% block title %}Admin - Manage Items{% endblock %}
+
+{# Add custom styles for this page #}
+{% block styles %}
+    {{ parent() }} {# Include styles from base template #}
+    <style>
+        /* Dark theme for form controls */
+        .form-control-dark {
+            background-color: var(--topbar-search-bg);
+            border: 1px solid var(--input-border-color);
+            color: var(--topbar-search-text) !important;
+        }
+        .form-control-dark::placeholder {
+            color: var(--muted-text-color);
+        }
+        .form-control-dark:focus {
+            background-color: var(--topbar-search-bg);
+            border-color: var(--sidebar-active-border);
+            box-shadow: none;
+            color: var(--topbar-search-text) !important;
+        }
+        /* Style for input-group-text in dark form */
+        .form-control-dark-icon {
+            background-color: var(--topbar-search-bg);
+            border: 1px solid var(--input-border-color);
+            color: var(--muted-text-color);
+            border-right: none; /* Combine with input */
+        }
+        .form-control-dark:focus + .form-control-dark-icon {
+             border-color: var(--sidebar-active-border);
+        }
+        .form-control-dark.with-icon {
+            border-left: none;
+        }
+
+        .form-select-dark {
+            background-color: var(--topbar-search-bg);
+            border: 1px solid var(--input-border-color);
+            color: var(--topbar-text-color);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23a0aaba' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        }
+        .form-select-dark:focus {
+             border-color: var(--sidebar-active-border);
+             box-shadow: none;
+        }
+
+        /* Fix for form labels inside the glass card */
+        .card-glass .form-label {
+            color: var(--sidebar-link-color); /* Muted white from your theme */
+        }
+        
+        /* Dark Pagination */
+        .pagination-dark .page-link {
+            background-color: var(--sidebar-bg);
+            border-color: var(--input-border-color);
+            color: var(--sidebar-link-color);
+            margin: 0 2px; /* Add spacing */
+            border-radius: 0.25rem; /* Rounded corners */
+        }
+        .pagination-dark .page-link:hover {
+            background-color: var(--card-bg);
+            color: var(--sidebar-link-active-color);
+        }
+        .pagination-dark .page-item.active .page-link {
+            background-color: var(--sidebar-link-active-bg);
+            border-color: var(--sidebar-link-active-bg);
+            color: var(--sidebar-link-active-color);
+        }
+         .pagination-dark .page-item.disabled .page-link {
+             background-color: var(--sidebar-header-bg);
+             border-color: var(--input-border-color);
+             color: var(--muted-text-color);
+         }
+
+        /* Table Image Preview */
+        .table-item-img {
+            width: 70px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            border: 1px solid var(--input-border-color);
+        }
+        .table-item-img:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5); /* Blue glow */
+        }
+        /* Styles for Modals in Dark Mode */
+        .modal-content {
+            background-color: var(--card-bg);
+            border: 1px solid var(--input-border-color);
+            color: var(--text-color);
+        }
+        .modal-header {
+             border-bottom: 1px solid var(--input-border-color);
+        }
+        .modal-footer {
+             border-top: 1px solid var(--input-border-color);
+        }
+        .btn-close-white {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+        /* End Modal Styles */
+
+        /* Improved Table Style */
+        .table.table-dark {
+            --bs-table-bg: transparent; /* Make table bg transparent */
+            --bs-table-border-color: var(--input-border-color);
+            --bs-table-striped-bg: rgba(255, 255, 255, 0.02); /* Make striping very subtle */
+            --bs-table-hover-bg: rgba(255, 255, 255, 0.07); /* Keep hover effect */
+        }
+        .table thead th {
+             color: var(--sidebar-link-color);
+             text-transform: uppercase;
+             font-size: 0.8rem;
+             letter-spacing: 0.5px;
+             border-bottom-width: 2px;
+             border-bottom-color: var(--input-border-color);
+        }
+        .table .fw-bold {
+            color: var(--text-color); /* Ensure main item name is bright */
+        }
+        .table .text-muted {
+             color: var(--sidebar-link-color) !important; /* Make muted text more readable */
+        }
+        
+    </style>
+{% endblock %}
+
+
+{% block admin_content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 dash-title">Manage Items</h1>
+        <a href="{{ BASE_PATH }}/reportitem" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Add New Item
+        </a>
+    </div>
+
+    {# Filters/Search Form in its own glass card #}
+    <div class="card card-glass mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ BASE_PATH }}/admin/items">
+                <div class="row g-3 align-items-end">
+                    {# Search Input - Made wider #}
+                    <div class="col-md-4">
+                        <label for="searchInput" class="form-label small">Search</label>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text form-control-dark-icon"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control form-control-dark with-icon" id="searchInput" name="search" placeholder="Search by name, location..." value="{{ app.request.query.get('search', '') }}">
+                        </div>
+                    </div>
+                    {# Status Filter #}
+                    <div class="col-md-2">
+                         <label for="statusFilter" class="form-label small">Status</label>
+                        <select class="form-select form-select-sm form-select-dark" id="statusFilter" name="status" aria-label="Filter by status">
+                            <option value="all" {% if app.request.query.get('status', 'all') == 'all' %}selected{% endif %}>All Statuses</option>
+                            <option value="found" {% if app.request.query.get('status') == 'found' %}selected{% endif %}>Found</option>
+                            <option value="claimed" {% if app.request.query.get('status') == 'claimed' %}selected{% endif %}>Claimed</option>
+                            <option value="archived" {% if app.request.query.get('status') == 'archived' %}selected{% endif %}>Archived</option>
+                        </select>
+                    </div>
+                    {# Category Filter #}
+                    <div class="col-md-2">
+                         <label for="categoryFilter" class="form-label small">Category</label>
+                         <select class="form-select form-select-sm form-select-dark" id="categoryFilter" name="category_id" aria-label="Filter by category">
+                            <option value="all" {% if app.request.query.get('category_id', 'all') == 'all' %}selected{% endif %}>All Categories</option>
+                            <option value="1" {% if app.request.query.get('category_id') == '1' %}selected{% endif %}>Electronics</option>
+                            <option value="2" {% if app.request.query.get('category_id') == '2' %}selected{% endif %}>Books & Notes</option>
+                            <option value="3" {% if app.request.query.get('category_id') == '3' %}selected{% endif %}>Clothing</option>
+                            <option value="4" {% if app.request.query.get('category_id') == '4' %}selected{% endif %}>IDs & Cards</option>
+                            <option value="5" {% if app.request.query.get('category_id') == '5' %}selected{% endif %}>Other</option>
+                         </select>
+                    </div>
+                    {# Sort Order Filter #}
+                     <div class="col-md-2">
+                         <label for="sortFilter" class="form-label small">Sort By</label>
+                         <select class="form-select form-select-sm form-select-dark" id="sortFilter" name="sort" aria-label="Sort by date">
+                             <option value="newest" {% if app.request.query.get('sort', 'newest') == 'newest' %}selected{% endif %}>Newest First</option>
+                             <option value="oldest" {% if app.request.query.get('sort') == 'oldest' %}selected{% endif %}>Oldest First</option>
+                         </select>
+                    </div>
+                    {# Submit Button #}
+                    <div class="col-md-2 d-grid">
+                        <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-funnel-fill me-1"></i> Filter</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {# Display Error Message if present #}
+    {% if error_message is defined and error_message %}
+        <div class="alert alert-danger">{{ error_message }}</div>
+    {% endif %}
+
+    <div class="card card-glass">
+        <div class="card-header d-flex justify-content-between align-items-center">
+             <span>All Reported Items (Page {{ currentPage }} of {{ totalPages }})</span>
+             {# Optional: Display total item count #}
+             {# <span class="badge bg-secondary">{{ totalItems }} Total</span> #}
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                {# Applied custom table styles via CSS block #}
+                <table class="table table-dark table-striped table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th scope="col">#ID</th>
+                            <th scope="col">Image</th>
+                            <th scope="col">Item Details</th> {# Combined Name & Description #}
+                            <th scope="col">Category</th>
+                            <th scope="col">Location</th>
+                            <th scope="col">Reporter</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Date Reported</th>
+                            <th scope="col" class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if items is not empty %}
+                            {% for item in items %}
+                            <tr>
+                                <th scope="row">{{ item.id }}</th>
+                                <td>
+                                    {# This <a> tag triggers the modal #}
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal" 
+                                       data-image-url="{{ BASE_PATH }}/{{ item.item_image_url }}" 
+                                       data-image-title="{{ item.item_name | escape('html_attr') }}">
+                                        <img src="{{ BASE_PATH }}/{{ item.item_image_url | default('https://placehold.co/80x60/6c757d/FFFFFF?text=No+Img') }}"
+                                             alt="{{ item.item_name }}" class="table-item-img">
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="fw-bold">{{ item.item_name }}</div>
+                                    <small class="text-muted d-block" style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ item.item_description | default('') }}">
+                                        {{ item.item_description | default('') }}
+                                    </small>
+                                </td>
+                                <td>{{ item.category_name | default('N/A') }}</td>
+                                <td>{{ item.found_location }}</td>
+                                <td>{{ item.reporter_first_name | default('') }} {{ item.reporter_last_name | default('') }}</td> {# Full Name #}
+                                <td>
+                                    {% if item.item_status == 'found' %}
+                                        <span class="badge text-bg-success">Found</span>
+                                    {% elseif item.item_status == 'claimed' %}
+                                        <span class="badge text-bg-primary">Claimed</span>
+                                    {% elseif item.item_status == 'archived' %}
+                                        <span class="badge text-bg-secondary">Archived</span>
+                                    {% else %}
+                                        <span class="badge text-bg-warning">{{ item.item_status | capitalize }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ item.reported_at | date("M j, Y") }}</td>
+                                <td class="text-center">
+                                    <div class="btn-group">
+                                        <a href="{{ BASE_PATH }}/viewitem?id={{ item.id }}" class="btn btn-sm btn-info" title="View Details">
+                                            <i class="bi bi-eye-fill"></i>
+                                        </a>
+                                        <a href="{{ BASE_PATH }}/admin/items/edit?id={{ item.id }}" class="btn btn-sm btn-warning" title="Edit Item">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </a>
+                                        <div class="btn-group">
+                                             <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Change Status">
+                                                 <i class="bi bi-tag-fill"></i>
+                                             </button>
+                                             <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                                                 <li><a class="dropdown-item {% if item.item_status == 'found' %}disabled{% endif %}" href="{{ BASE_PATH }}/admin/items/status?id={{ item.id }}&status=found">Mark as Found</a></li>
+                                                 <li><a class="dropdown-item {% if item.item_status == 'claimed' %}disabled{% endif %}" href="{{ BASE_PATH }}/admin/items/status?id={{ item.id }}&status=claimed">Mark as Claimed</a></li>
+                                                 <li><a class="dropdown-item {% if item.item_status == 'archived' %}disabled{% endif %}" href="{{ BASE_PATH }}/admin/items/status?id={{ item.id }}&status=archived">Mark as Archived</a></li>
+                                             </ul>
+                                        </div>
+                                         {# NEW: Delete button triggers modal #}
+                                         <button type="button" class="btn btn-sm btn-danger" title="Delete Item"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#deleteModal"
+                                            data-delete-url="{{ BASE_PATH }}/admin/items/delete" 
+                                            data-item-id="{{ item.id }}"
+                                            data-item-name="{{ item.item_name | escape('html_attr') }}">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="9" class="text-center text-muted py-4">No items found matching your criteria.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div> {# End table-responsive #}
+
+            {# Dynamic Pagination #}
+            {% if totalPages > 1 %}
+             <nav aria-label="Table pagination" class="mt-3">
+                 <ul class="pagination justify-content-center pagination-dark">
+                     <li class="page-item {% if currentPage == 1 %} disabled {% endif %}">
+                         <a class="page-link" href="{{ BASE_PATH }}/admin/items?{{ filters|url_encode }}&page={{ currentPage - 1 }}">Previous</a>
+                     </li>
+                     {% for i in 1..totalPages %}
+                         <li class="page-item {% if i == currentPage %} active {% endif %}" {% if i == currentPage %} aria-current="page" {% endif %}>
+                            <a class="page-link" href="{{ BASE_PATH }}/admin/items?{{ filters|url_encode }}&page={{ i }}">{{ i }}</a>
+                         </li>
+                     {% endfor %}
+                     <li class="page-item {% if currentPage == totalPages %} disabled {% endif %}">
+                         <a class="page-link" href="{{ BASE_PATH }}/admin/items?{{ filters|url_encode }}&page={{ currentPage + 1 }}">Next</a>
+                     </li>
+                 </ul>
+             </nav>
+            {% endif %}
+
+        </div> {# End card-body #}
+    </div> {# End card #}
+</div> {# End container #}
+
+<!-- Image Preview Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="imageModalLabel">Item Image</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        {# THE FIX: src is initially empty. JavaScript will set it. #}
+        <img src="" id="modalImage" class="img-fluid rounded" alt="Item Preview" style="max-height: 70vh;">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEW: Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Confirm Deletion</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to permanently delete this item?</p>
+        <p class="text-warning"><strong>Item: <span id="deleteItemName"></span></strong></p>
+        <p class="text-muted small">This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        {# This form will be submitted for deletion #}
+        <form id="deleteForm" action="" method="POST" style="display: inline;">
+             <input type="hidden" name="item_id" id="deleteItemId">
+             {# Add CSRF token here if using them #}
+             <button type="submit" class="btn btn-danger">Delete Item</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }} {# Include base template JS if needed #}
+<script>
+    // JavaScript for Image Preview Modal
+    const imageModal = document.getElementById('imageModal');
+    if (imageModal) {
+      imageModal.addEventListener('show.bs.modal', event => {
+        // Button that triggered the modal
+        const triggerButton = event.relatedTarget;
+        // Extract info from data-bs-* attributes
+        const imageUrl = triggerButton.getAttribute('data-image-url');
+        const imageTitle = triggerButton.getAttribute('data-image-title');
+        
+        // Update the modal's content
+        const modalTitle = imageModal.querySelector('.modal-title');
+        const modalImage = imageModal.querySelector('#modalImage');
+
+        modalTitle.textContent = imageTitle;
+        modalImage.src = imageUrl; // This is where the magic happens
+      });
+    }
+
+    // NEW: JavaScript for Delete Confirmation Modal
+    const deleteModal = document.getElementById('deleteModal');
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', event => {
+            // Button that triggered the modal
+            const triggerButton = event.relatedTarget;
+            
+            // Extract info from data-bs-* attributes
+            const deleteUrl = triggerButton.getAttribute('data-delete-url');
+            const itemId = triggerButton.getAttribute('data-item-id');
+            const itemName = triggerButton.getAttribute('data-item-name');
+            
+            // Update the modal's content
+            const modalItemName = deleteModal.querySelector('#deleteItemName');
+            const deleteForm = deleteModal.querySelector('#deleteForm');
+            const deleteItemIdInput = deleteModal.querySelector('#deleteItemId');
+
+            modalItemName.textContent = `#${itemId} - ${itemName}`;
+            deleteForm.action = deleteUrl; // Set the form's action URL
+            deleteItemIdInput.value = itemId; // Set the hidden input value
+        });
+    }
+</script>
+{% endblock %}
+

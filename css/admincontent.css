@@ -38,7 +38,7 @@ body {
     flex-shrink: 0;
     height: 100vh;
     overflow-y: auto;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     position: relative;
     z-index: 100;
 }
@@ -55,6 +55,7 @@ body {
     justify-content: center;
     min-height: 70px;
 }
+
 .sidebar-header .bi {
     margin-right: 10px;
     font-size: 1.8rem;
@@ -68,6 +69,7 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     color: var(--text-color);
 }
+
 .sidebar-profile img {
     width: 40px;
     height: 40px;
@@ -76,10 +78,12 @@ body {
     border: 2px solid #007bff;
     object-fit: cover;
 }
+
 .sidebar-profile .profile-name {
     font-weight: bold;
     line-height: 1.2;
 }
+
 .sidebar-profile .profile-role {
     font-size: 0.85rem;
     color: var(--muted-text-color);
@@ -89,9 +93,11 @@ body {
     padding-top: 0;
     padding-bottom: 1rem;
 }
+
 .sidebar-nav .nav-item {
     margin-bottom: 0.1rem;
 }
+
 .sidebar-nav .nav-link {
     display: flex;
     align-items: center;
@@ -103,6 +109,7 @@ body {
     transition: all 0.2s ease-in-out;
     position: relative;
 }
+
 .sidebar-nav .nav-link .bi {
     font-size: 1.2rem;
     margin-right: 15px;
@@ -110,19 +117,22 @@ body {
     text-align: center;
     color: var(--sidebar-link-color);
 }
+
 .sidebar-nav .nav-link:hover {
     color: var(--sidebar-link-active-color);
     background-color: var(--sidebar-link-hover-bg);
 }
+
 .sidebar-nav .nav-link.active {
     color: var(--sidebar-link-active-color);
     background-color: rgba(0, 123, 255, 0.15);
     border-left: 4px solid var(--sidebar-active-border);
     padding-left: calc(1.5rem - 4px);
 }
- .sidebar-nav .nav-link.active .bi {
+
+.sidebar-nav .nav-link.active .bi {
     color: var(--sidebar-active-border);
- }
+}
 
 .sidebar-nav .nav-item.sidebar-title {
     color: var(--muted-text-color);
@@ -137,24 +147,29 @@ body {
     padding-left: 3.5rem;
     font-size: 0.9rem;
 }
+
 .sidebar-nav .collapse-menu .nav-item .nav-link .bi {
     font-size: 0.9rem;
     margin-right: 10px;
 }
+
 .sidebar-nav .dropdown-toggle::after {
     margin-left: auto;
 }
+
 .sidebar-nav .collapse-menu {
-    background-color: rgba(0,0,0,0.1);
+    background-color: rgba(0, 0, 0, 0.1);
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
 }
+
 .sidebar-nav .collapse-menu .nav-link.active {
     background-color: var(--sidebar-link-active-bg);
     color: white;
     border-left: none;
     padding-left: 3.5rem;
 }
+
 .sidebar-nav .collapse-menu .nav-link.active .bi {
     color: white;
 }
@@ -185,43 +200,52 @@ body {
     display: flex;
     align-items: center;
 }
+
 .top-navbar .navbar-brand {
     display: none;
 }
+
 .top-navbar .nav-link {
     color: var(--topbar-icon-color);
     font-size: 1.2rem;
     padding: 0.5rem 0.75rem;
     transition: color 0.2s ease-in-out;
 }
+
 .top-navbar .nav-link:hover {
     color: var(--sidebar-link-active-color);
 }
+
 .top-navbar .nav-link .bi {
     color: inherit;
 }
+
 .top-navbar .avatar {
     width: 36px;
     height: 36px;
     border-radius: 50%;
     margin-left: 10px;
     object-fit: cover;
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
+
 .top-navbar .dropdown-menu {
     background-color: var(--topbar-dropdown-bg);
     border: 1px solid var(--topbar-dropdown-border);
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
+
 .top-navbar .dropdown-item {
     color: var(--text-color);
     padding: 0.5rem 1rem;
     transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
+
 .top-navbar .dropdown-item:hover {
     background-color: rgba(255, 255, 255, 0.08);
     color: var(--sidebar-link-active-color);
 }
+
 .top-navbar .dropdown-divider {
     border-color: rgba(255, 255, 255, 0.1);
 }
@@ -232,18 +256,59 @@ body {
     overflow-y: auto;
 }
 
-.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     color: var(--text-color);
 }
+
 .text-muted {
     color: var(--muted-text-color) !important;
 }
+
 .btn-outline-secondary {
     color: var(--muted-text-color);
     border-color: var(--input-border-color);
 }
+
 .btn-outline-secondary:hover {
     color: var(--text-color);
     background-color: rgba(255, 255, 255, 0.1);
     border-color: rgba(255, 255, 255, 0.2);
+}
+
+.card-glass {
+    background: rgba(42, 54, 68, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: none;
+}
+
+.card-glass .card-header {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+}
+
+.card-glass hr {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.card-glass .card-title {
+    color: var(--text-color);
+}
+
+.card-glass .card-text {
+    color: var(--sidebar-link-color);
 }
