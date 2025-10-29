@@ -1059,7 +1059,7 @@ switch ($route) {
         if ($status === 'added') $successMessage = "Category successfully added!";
         if ($status === 'updated') $successMessage = "Category successfully updated!";
         if ($status === 'deleted') $successMessage = "Category successfully deleted!";
-        
+
         $error = filter_input(INPUT_GET, 'error', FILTER_SANITIZE_STRING);
         if ($error === 'duplicate') $errorMessage = "A category with that name already exists.";
         if ($error === 'update_failed') $errorMessage = "Could not update category.";
@@ -1078,14 +1078,13 @@ switch ($route) {
                     LEFT JOIN lost_items li ON c.category_id = li.category_id
                     GROUP BY c.category_id, c.category_name
                     ORDER BY c.category_name ASC";
-            
+
             $stmt = $conn->query($sql);
             if ($stmt) {
                 $categories = $stmt->fetchAll(PDO::FETCH_OBJ);
             } else {
                 throw new PDOException("Failed to fetch categories. Error: " . implode(" ", $conn->errorInfo()));
             }
-
         } catch (PDOException $e) {
             $errorMessage = 'Could not load categories due to a database error.';
             error_log("Admin Categories Error: " . $e->getMessage());
@@ -1111,8 +1110,8 @@ switch ($route) {
         $categoryName = trim(filter_input(INPUT_POST, 'category_name', FILTER_SANITIZE_STRING));
 
         if (empty($categoryName)) {
-             header('Location: ' . BASE_PATH . '/admin/categories?error=name_required');
-             exit;
+            header('Location: ' . BASE_PATH . '/admin/categories?error=name_required');
+            exit;
         }
 
         try {
@@ -1122,13 +1121,12 @@ switch ($route) {
 
             header('Location: ' . BASE_PATH . '/admin/categories?status=added');
             exit;
-
         } catch (PDOException $e) {
             error_log("Category Add Error: " . $e->getMessage());
             if ($e->getCode() == '23000') { // Integrity constraint violation (likely duplicate)
-                 header('Location: ' . BASE_PATH . '/admin/categories?error=duplicate');
+                header('Location: ' . BASE_PATH . '/admin/categories?error=duplicate');
             } else {
-                 header('Location: ' . BASE_PATH . '/admin/categories?error=add_failed');
+                header('Location: ' . BASE_PATH . '/admin/categories?error=add_failed');
             }
             exit;
         }
@@ -1137,44 +1135,43 @@ switch ($route) {
     // ===============================================
     // == '/admin/categories/edit' ROUTE (POST) ==
     // ===============================================
-     case '/admin/categories/edit':
+    case '/admin/categories/edit':
         // --- PROTECTED ROUTE & POST CHECK ---
         if (!isset($_SESSION['is_admin_logged_in']) || $_SESSION['is_admin_logged_in'] !== true || $_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: ' . BASE_PATH . '/admin/categories?error=invalid_request');
             exit;
         }
-        
+
         $categoryId = filter_input(INPUT_POST, 'category_id', FILTER_VALIDATE_INT);
         $categoryName = trim(filter_input(INPUT_POST, 'category_name', FILTER_SANITIZE_STRING));
 
         if (!$categoryId || empty($categoryName)) {
-             header('Location: ' . BASE_PATH . '/admin/categories?error=invalid_data');
-             exit;
+            header('Location: ' . BASE_PATH . '/admin/categories?error=invalid_data');
+            exit;
         }
 
         try {
             $sql = "UPDATE categories SET category_name = :name WHERE category_id = :id";
             $stmt = $conn->prepare($sql);
             $stmt->execute([':name' => $categoryName, ':id' => $categoryId]);
-            
+
             header('Location: ' . BASE_PATH . '/admin/categories?status=updated');
             exit;
-
         } catch (PDOException $e) {
-             error_log("Category Edit Error: " . $e->getMessage());
-             if ($e->getCode() == '23000') { // Duplicate name
-                 header('Location: ' . BASE_PATH . '/admin/categories?error=duplicate');
-             } else {
-                 header('Location: ' . BASE_PATH . '/admin/categories?error=update_failed');
-             }
-             exit;
+            error_log("Category Edit Error: " . $e->getMessage());
+            if ($e->getCode() == '23000') { // Duplicate name
+                header('Location: ' . BASE_PATH . '/admin/categories?error=duplicate');
+            } else {
+                header('Location: ' . BASE_PATH . '/admin/categories?error=update_failed');
+            }
+            exit;
         }
         break; // End /admin/categories/edit
 
     // ===============================================
     // == '/admin/categories/delete' ROUTE (POST) ==
     // ===============================================
-     case '/admin/categories/delete':
+    case '/admin/categories/delete':
         // --- PROTECTED ROUTE & POST CHECK ---
         if (!isset($_SESSION['is_admin_logged_in']) || $_SESSION['is_admin_logged_in'] !== true || $_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: ' . BASE_PATH . '/admin/categories?error=invalid_request');
@@ -1182,46 +1179,290 @@ switch ($route) {
         }
 
         $categoryId = filter_input(INPUT_POST, 'category_id', FILTER_VALIDATE_INT);
-        
+
         if (!$categoryId) {
-             header('Location: ' . BASE_PATH . '/admin/categories?error=invalid_id');
-             exit;
+            header('Location: ' . BASE_PATH . '/admin/categories?error=invalid_id');
+            exit;
         }
 
         try {
             $sql = "DELETE FROM categories WHERE category_id = :id";
             $stmt = $conn->prepare($sql);
             $stmt->execute([':id' => $categoryId]);
-            
+
             if ($stmt->rowCount() > 0) {
-                 header('Location: ' . BASE_PATH . '/admin/categories?status=deleted');
+                header('Location: ' . BASE_PATH . '/admin/categories?status=deleted');
             } else {
-                 header('Location: ' . BASE_PATH . '/admin/categories?error=not_found');
+                header('Location: ' . BASE_PATH . '/admin/categories?error=not_found');
             }
             exit;
-
         } catch (PDOException $e) {
-             error_log("Category Delete Error: " . $e->getMessage());
-             if ($e->getCode() == '23000') { // Integrity constraint violation (e.g., items still use this category)
-                 header('Location: ' . BASE_PATH . '/admin/categories?error=delete_failed');
-             } else {
-                 header('Location: ' . BASE_PATH . '/admin/categories?error=db_error');
-             }
-             exit;
+            error_log("Category Delete Error: " . $e->getMessage());
+            if ($e->getCode() == '23000') { // Integrity constraint violation (e.g., items still use this category)
+                header('Location: ' . BASE_PATH . '/admin/categories?error=delete_failed');
+            } else {
+                header('Location: ' . BASE_PATH . '/admin/categories?error=db_error');
+            }
+            exit;
         }
         break; // End /admin/categories/delete
 
     case '/admin/claims':
+        // --- PROTECTED ROUTE ---
+        if (!isset($_SESSION['is_admin_logged_in']) || $_SESSION['is_admin_logged_in'] !== true) {
+            header('Location: ' . BASE_PATH . '/admin?status=auth_required');
+            exit;
+        }
 
-        echo $twig->render("admin_claims.html.twig", []);
+        $claims = [];
+        $errorMessage = null;
+        $successMessage = null;
+        // Initialize stat card counts
+        $pendingClaimsCount = 0;
+        $approvedClaimsCount = 0;
+        $deniedClaimsCount = 0;
 
+        // Check for success/error messages from redirects
+        $status = filter_input(INPUT_GET, 'status', FILTER_SANITIZE_STRING);
+        if ($status === 'approved') $successMessage = "Claim successfully approved. Item status updated.";
+        if ($status === 'denied') $successMessage = "Claim successfully denied.";
+
+        $error = filter_input(INPUT_GET, 'error', FILTER_SANITIZE_STRING);
+        if ($error === 'approve_failed') $errorMessage = "Could not approve claim due to a database error.";
+        if ($error === 'deny_failed') $errorMessage = "Could not deny claim due to a database error.";
+        if ($error === 'invalid_request') $errorMessage = "Invalid request.";
+
+        try {
+            // --- 1. Fetch Counts for Stat Cards ---
+            $pendingStmt = $conn->query("SELECT COUNT(*) FROM claims WHERE claim_status = 'pending'");
+            $pendingClaimsCount = $pendingStmt ? $pendingStmt->fetchColumn() : 0;
+
+            $approvedStmt = $conn->query("SELECT COUNT(*) FROM claims WHERE claim_status = 'approved'");
+            $approvedClaimsCount = $approvedStmt ? $approvedStmt->fetchColumn() : 0;
+
+            $deniedStmt = $conn->query("SELECT COUNT(*) FROM claims WHERE claim_status = 'denied'");
+            $deniedClaimsCount = $deniedStmt ? $deniedStmt->fetchColumn() : 0;
+
+            // --- 2. Fetch All Claims for the Table ---
+            // Fetch all claims, joining with items and reporters (claimers)
+            $sql = "SELECT 
+                        cl.claim_id,
+                        cl.claim_status,
+                        cl.claim_date,
+                        li.item_id,
+                        li.item_name,
+                        r.first_name AS claimer_first_name,
+                        r.last_name AS claimer_last_name,
+                        r.student_id AS claimer_student_id
+                    FROM claims cl
+                    JOIN lost_items li ON cl.item_id = li.item_id
+                    JOIN reporters r ON cl.claimer_id = r.reporter_id
+                    ORDER BY 
+                        -- Show pending claims first, then by date
+                        CASE WHEN cl.claim_status = 'pending' THEN 1 ELSE 2 END ASC, 
+                        cl.claim_date DESC";
+
+            $stmt = $conn->query($sql);
+            if ($stmt) {
+                $claims = $stmt->fetchAll(PDO::FETCH_OBJ);
+            } else {
+                throw new PDOException("Failed to fetch claims. Error: " . implode(" ", $conn->errorInfo()));
+            }
+        } catch (PDOException $e) {
+            $errorMessage = 'Could not load claims due to a database error.';
+            error_log("Admin Claims Error: " . $e->getMessage());
+        }
+
+        echo $twig->render('admin_claims.html.twig', [
+            'claims' => $claims, // For the table
+            'pendingClaims' => $pendingClaimsCount, // For stat card
+            'approvedClaims' => $approvedClaimsCount, // For stat card
+            'deniedClaims' => $deniedClaimsCount, // For stat card
+            'error_message' => $errorMessage,
+            'success_message' => $successMessage
+        ]);
         break;
 
-    case '/admin/activity':
+    // ===============================================
+    // == '/admin/claims/approve' ROUTE (POST) ==
+    // ===============================================
+    case '/admin/claims/approve':
+        // --- PROTECTED ROUTE & POST CHECK ---
+        if (!isset($_SESSION['is_admin_logged_in']) || $_SESSION['is_admin_logged_in'] !== true || $_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASE_PATH . '/admin/claims?error=invalid_request');
+            exit;
+        }
 
-        echo $twig->render("admin_activity.html.twig", []);
+        $claimId = filter_input(INPUT_POST, 'claim_id', FILTER_VALIDATE_INT);
+        if (!$claimId) {
+            header('Location: ' . BASE_PATH . '/admin/claims?error=invalid_request');
+            exit;
+        }
 
-        break;
+        try {
+            $conn->beginTransaction(); // Start a transaction
+
+            // 1. Get the item_id associated with this claim
+            $itemSql = "SELECT item_id FROM claims WHERE claim_id = :claim_id AND claim_status = 'pending'"; // Ensure it's pending
+            $itemStmt = $conn->prepare($itemSql);
+            $itemStmt->execute([':claim_id' => $claimId]);
+            $itemId = $itemStmt->fetchColumn();
+
+            if (!$itemId) {
+                throw new Exception("Claim ID not found or already processed.");
+            }
+
+            // 2. Approve this specific claim
+            $approveSql = "UPDATE claims SET claim_status = 'approved' WHERE claim_id = :claim_id";
+            $conn->prepare($approveSql)->execute([':claim_id' => $claimId]);
+
+            // 3. Update the main item's status to 'claimed'
+            $updateItemSql = "UPDATE lost_items SET item_status = 'claimed' WHERE item_id = :item_id";
+            $conn->prepare($updateItemSql)->execute([':item_id' => $itemId]);
+
+            // 4. (Optional but recommended) Deny all other *pending* claims for this *same item*
+            $denyOthersSql = "UPDATE claims SET claim_status = 'denied', admin_notes = 'Item was claimed by another user.' 
+                              WHERE item_id = :item_id AND claim_status = 'pending'"; // Only deny other *pending* ones
+            $conn->prepare($denyOthersSql)->execute([':item_id' => $itemId]);
+
+            $conn->commit(); // Commit all changes
+
+            header('Location: ' . BASE_PATH . '/admin/claims?status=approved');
+            exit;
+        } catch (Exception $e) {
+            $conn->rollBack(); // Undo changes on error
+            error_log("Claim Approve Error: " . $e->getMessage());
+            header('Location: ' . BASE_PATH . '/admin/claims?error=approve_failed');
+            exit;
+        }
+        break; // End /admin/claims/approve
+
+    // ===============================================
+    // == '/admin/claims/deny' ROUTE (POST) ==
+    // ===============================================
+    case '/admin/claims/deny':
+        // --- PROTECTED ROUTE & POST CHECK ---
+        if (!isset($_SESSION['is_admin_logged_in']) || $_SESSION['is_admin_logged_in'] !== true || $_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASE_PATH . '/admin/claims?error=invalid_request');
+            exit;
+        }
+
+        $claimId = filter_input(INPUT_POST, 'claim_id', FILTER_VALIDATE_INT);
+        $denyReason = trim(filter_input(INPUT_POST, 'deny_reason', FILTER_SANITIZE_STRING));
+
+        if (!$claimId) {
+            header('Location: ' . BASE_PATH . '/admin/claims?error=invalid_request');
+            exit;
+        }
+
+        try {
+            $sql = "UPDATE claims SET claim_status = 'denied', admin_notes = :notes WHERE claim_id = :claim_id AND claim_status = 'pending'"; // Only deny pending
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([':notes' => $denyReason, ':claim_id' => $claimId]);
+
+            header('Location: ' . BASE_PATH . '/admin/claims?status=denied');
+            exit;
+        } catch (PDOException $e) {
+            error_log("Claim Deny Error: " . $e->getMessage());
+            header('Location: ' . BASE_PATH . '/admin/claims?error=deny_failed');
+            exit;
+        }
+        break; // End /admin/claims/deny
+
+    case '/submit_claim':
+        // --- POST CHECK ---
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASE_PATH . '/lostitems'); // Redirect if not POST
+            exit;
+        }
+
+        // --- 1. Get Form Data (Sanitize!) ---
+        $itemId = filter_input(INPUT_POST, 'item_id', FILTER_VALIDATE_INT);
+        $claimerFName = filter_input(INPUT_POST, 'first_name', FILTER_SANITIZE_STRING);
+        $claimerLName = filter_input(INPUT_POST, 'last_name', FILTER_SANITIZE_STRING);
+        $claimerStudentId = filter_input(INPUT_POST, 'student_id', FILTER_SANITIZE_STRING);
+        $claimerEmail = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+        $claimerContact = filter_input(INPUT_POST, 'contact_number', FILTER_SANITIZE_STRING);
+
+        // --- 2. Validation ---
+        if (!$itemId || empty($claimerFName) || empty($claimerLName) || empty($claimerStudentId) || $claimerEmail === false) {
+            // Simple validation failed
+            header('Location: ' . BASE_PATH . '/viewitem?id=' . $itemId . '&error=claim_failed');
+            exit;
+        }
+
+        try {
+            $conn->beginTransaction(); // Start transaction
+
+            // --- 3. Check if item is still 'found' and has no 'pending' claims ---
+            $checkSql = "SELECT li.item_status, COUNT(cl.claim_id) AS pending_claims
+                         FROM lost_items li
+                         LEFT JOIN claims cl ON li.item_id = cl.item_id AND cl.claim_status = 'pending'
+                         WHERE li.item_id = :item_id
+                         GROUP BY li.item_id";
+            $checkStmt = $conn->prepare($checkSql);
+            $checkStmt->execute([':item_id' => $itemId]);
+            $itemStatusResult = $checkStmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$itemStatusResult || $itemStatusResult['item_status'] !== 'found' || $itemStatusResult['pending_claims'] > 0) {
+                // Item is not available or already has a pending claim
+                $conn->rollBack();
+                header('Location: ' . BASE_PATH . '/viewitem?id=' . $itemId . '&error=already_claimed');
+                exit;
+            }
+
+            // --- 4. Find or Create Claimer in 'reporters' table ---
+            $claimerId = null;
+            $checkRepSql = "SELECT reporter_id FROM reporters WHERE student_id = :sid OR email = :email LIMIT 1";
+            $checkRepStmt = $conn->prepare($checkRepSql);
+            $checkRepStmt->execute([':sid' => $claimerStudentId, ':email' => $claimerEmail]);
+            $existingReporter = $checkRepStmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($existingReporter) {
+                $claimerId = $existingReporter['reporter_id'];
+                // Optional: Update their name/contact info just in case
+                $updateRepSql = "UPDATE reporters SET first_name = :fname, last_name = :lname, contact_number = :contact WHERE reporter_id = :id";
+                $conn->prepare($updateRepSql)->execute([
+                    ':fname' => $claimerFName,
+                    ':lname' => $claimerLName,
+                    ':contact' => $claimerContact,
+                    ':id' => $claimerId
+                ]);
+            } else {
+                // Insert new reporter (as they are the claimer)
+                $insertRepSql = "INSERT INTO reporters (first_name, last_name, student_id, email, contact_number) VALUES (:fname, :lname, :sid, :email, :contact)";
+                $insertRepStmt = $conn->prepare($insertRepSql);
+                $insertRepStmt->execute([
+                    ':fname' => $claimerFName,
+                    ':lname' => $claimerLName,
+                    ':sid' => $claimerStudentId,
+                    ':email' => $claimerEmail,
+                    ':contact' => $claimerContact
+                ]);
+                $claimerId = $conn->lastInsertId();
+            }
+
+            // --- 5. Create the new Claim Request ---
+            $insertClaimSql = "INSERT INTO claims (item_id, claimer_id, claim_status, claim_date) VALUES (:item_id, :claimer_id, 'pending', NOW())";
+            $insertClaimStmt = $conn->prepare($insertClaimSql);
+            $insertClaimStmt->execute([
+                ':item_id' => $itemId,
+                ':claimer_id' => $claimerId
+            ]);
+
+            $conn->commit(); // Commit all changes
+
+            // --- 6. Redirect with Success ---
+            header('Location: ' . BASE_PATH . '/viewitem?id=' . $itemId . '&status=claim_submitted');
+            exit;
+        } catch (Exception $e) {
+            $conn->rollBack(); // Undo all changes on any error
+            error_log("Claim Submission Error: " . $e->getMessage());
+            header('Location: ' . BASE_PATH . '/viewitem?id=' . $itemId . '&error=claim_failed');
+            exit;
+        }
+        break; // End /submit_claim
+
 
     default:
         http_response_code(404);

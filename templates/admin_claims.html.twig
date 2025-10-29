@@ -1,11 +1,354 @@
-{% extends "adminbase.html.twig" %} 
+{% extends "adminbase.html.twig" %} {# Ensure this matches your base template file name #}
 
-{% block title %}Admin Claims{% endblock %}
+{% block title %}Admin - Manage Claims{% endblock %}
 
-{% block admin_content%}
-<div class="container">
-    <h1 class="h2 mb-4 dash-title">Claims Overview</h1>
+{# Add custom styles for this page #}
+{% block styles %}
+    {{ parent() }} {# Include styles from base template #}
+    <style>
+        /* Dark theme for form controls */
+        .form-control-dark {
+            background-color: var(--topbar-search-bg, rgba(255, 255, 255, 0.05));
+            border: 1px solid var(--input-border-color, rgba(255, 255, 255, 0.1));
+            color: var(--topbar-search-text, #fff) !important;
+        }
+        .form-control-dark::placeholder {
+            color: var(--muted-text-color, #6c757d);
+        }
+        .form-control-dark:focus {
+            background-color: var(--topbar-search-bg, rgba(255, 255, 255, 0.05));
+            border-color: var(--sidebar-active-border, #007bff);
+            box-shadow: none;
+            color: var(--topbar-search-text, #fff) !important;
+        }
+        .form-select-dark {
+            background-color: var(--topbar-search-bg, rgba(255, 255, 255, 0.05));
+            border: 1px solid var(--input-border-color, rgba(255, 255, 255, 0.1));
+            color: var(--topbar-text-color, #A0AABA);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23a0aaba' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        }
+        .form-select-dark:focus {
+             border-color: var(--sidebar-active-border, #007bff);
+             box-shadow: none;
+        }
+        .card-glass .form-label {
+            color: var(--sidebar-link-color, #A0AABA);
+        }
+        
+        /* Modal Styles */
+        .modal-content {
+            background-color: var(--card-bg, #2A3644);
+            border: 1px solid var(--input-border-color, rgba(255, 255, 255, 0.1));
+            color: var(--text-color, #E2E8F0);
+        }
+        .modal-header {
+             border-bottom: 1px solid var(--input-border-color, rgba(255, 255, 255, 0.1));
+        }
+        .modal-footer {
+             border-top: 1px solid var(--input-border-color, rgba(255, 255, 255, 0.1));
+        }
+        .btn-close-white {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+        /* End Modal Styles */
+
+        /* Improved Table Style */
+        .table.table-dark {
+            --bs-table-bg: transparent;
+            --bs-table-border-color: var(--input-border-color, rgba(255, 255, 255, 0.1));
+            --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
+            --bs-table-hover-bg: rgba(255, 255, 255, 0.07);
+        }
+        .table thead th {
+             color: var(--sidebar-link-color, #A0AABA);
+             text-transform: uppercase;
+             font-size: 0.8rem;
+             letter-spacing: 0.5px;
+             border-bottom-width: 2px;
+             border-bottom-color: var(--input-border-color, rgba(255, 255, 255, 0.1));
+        }
+        .table .fw-bold {
+            color: var(--text-color, #E2E8F0);
+        }
+        .table .text-muted {
+             color: var(--sidebar-link-color, #A0AABA) !important;
+        }
+         /* Dark Pagination */
+         .pagination-dark .page-link {
+            background-color: var(--sidebar-bg, #222B38);
+            border-color: var(--input-border-color, rgba(255, 255, 255, 0.1));
+            color: var(--sidebar-link-color, #A0AABA);
+            margin: 0 2px;
+            border-radius: 0.25rem;
+        }
+        .pagination-dark .page-link:hover {
+            background-color: var(--card-bg, #2A3644);
+            color: var(--sidebar-link-active-color, #fff);
+        }
+        .pagination-dark .page-item.active .page-link {
+            background-color: var(--sidebar-link-active-bg, #007bff);
+            border-color: var(--sidebar-link-active-bg, #007bff);
+            color: var(--sidebar-link-active-color, #fff);
+        }
+         .pagination-dark .page-item.disabled .page-link {
+             background-color: var(--sidebar-header-bg, #1B222C);
+             border-color: var(--input-border-color, rgba(255, 255, 255, 0.1));
+             color: var(--muted-text-color, #6C757D);
+         }
+    </style>
+{% endblock %}
+
+
+{% block admin_content %}
+<div class="container-fluid">
+    <h1 class="h2 mb-4 dash-title">Manage Claims</h1>
+
+    {# Display Error/Success Messages from PHP redirects #}
+    {% if error_message is defined and error_message %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ error_message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+    {% if success_message is defined and success_message %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ success_message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+
+    {# Stat Cards Row - Now dynamic #}
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card card-glass h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="flex-shrink-0 me-3">
+                        <i class="bi bi-clock-history display-4 text-warning"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <p class="card-text text-muted mb-1">Pending Claims</p>
+                        <h4 class="card-title mb-0">{{ pendingClaims | default(0) }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-glass h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="flex-shrink-0 me-3">
+                        <i class="bi bi-check-lg display-4 text-success"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <p class="card-text text-muted mb-1">Approved Claims</p>
+                        <h4 class="card-title mb-0">{{ approvedClaims | default(0) }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-glass h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="flex-shrink-0 me-3">
+                        <i class="bi bi-x-lg display-4 text-danger"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <p class="card-text text-muted mb-1">Denied Claims</p>
+                        <h4 class="card-title mb-0">{{ deniedClaims | default(0) }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> {# End Stats Row #}
+
+
+    <div class="card card-glass">
+        <div class="card-header">
+            All Claim Requests
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-dark table-striped table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th scope="col">Claim ID</th>
+                            <th scope="col">Item Name</th>
+                            <th scope="col">Claimer</th>
+                            <th scope="col">Claimer Student ID</th>
+                            <th scope="col">Date Claimed</th>
+                            <th scope="col">Status</th>
+                            <th scope="col" class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {# --- START: Dynamic Twig Loop --- #}
+                        {% if claims is not empty %}
+                            {% for claim in claims %}
+                            <tr>
+                                <th scope="row">{{ claim.claim_id }}</th>
+                                <td>
+                                    {# Link to the main viewitem page for this item #}
+                                    <a href="{{ BASE_PATH }}/viewitem?id={{ claim.item_id }}" class="fw-bold text-white" title="View Item Details">{{ claim.item_name }}</a>
+                                </td>
+                                <td>{{ claim.claimer_first_name }} {{ claim.claimer_last_name }}</td>
+                                <td>{{ claim.claimer_student_id }}</td>
+                                <td>{{ claim.claim_date | date("M j, Y g:i a") }}</td>
+                                <td>
+                                    {# Dynamic Status Badge #}
+                                    {% if claim.claim_status == 'pending' %}
+                                        <span class="badge text-bg-warning">Pending</span>
+                                    {% elseif claim.claim_status == 'approved' %}
+                                        <span class="badge text-bg-success">Approved</span>
+                                    {% elseif claim.claim_status == 'denied' %}
+                                        <span class="badge text-bg-danger">Denied</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {# Only show actions if claim is 'pending' #}
+                                    {% if claim.claim_status == 'pending' %}
+                                        <button class="btn btn-sm btn-success" title="Approve Claim"
+                                            data-bs-toggle="modal" data-bs-target="#approveModal"
+                                            data-claim-id="{{ claim.claim_id }}"
+                                            data-item-name="{{ claim.item_name | escape('html_attr') }}"
+                                            data-claimer-name="{{ claim.claimer_first_name }} {{ claim.claimer_last_name }}">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" title="Deny Claim"
+                                            data-bs-toggle="modal" data-bs-target="#denyModal"
+                                            data-claim-id="{{ claim.claim_id }}"
+                                            data-item-name="{{ claim.item_name | escape('html_attr') }}"
+                                            data-claimer-name="{{ claim.claimer_first_name }} {{ claim.claimer_last_name }}">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    {% else %}
+                                        <span class="text-muted small">Processed</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">No claim requests found.</td>
+                            </tr>
+                        {% endif %}
+                        {# --- END: Dynamic Twig Loop --- #}
+                    </tbody>
+                </table>
+            </div> {# End table-responsive #}
+
+            {# Dynamic Pagination #}
+            {% if totalPages > 1 %}
+             <nav aria-label="Table pagination" class="mt-3">
+                 <ul class="pagination justify-content-center pagination-dark">
+                     <li class="page-item {% if currentPage == 1 %} disabled {% endif %}">
+                         <a class="page-link" href="{{ BASE_PATH }}/admin/claims?{{ filters|url_encode }}&page={{ currentPage - 1 }}">Previous</a>
+                     </li>
+                     {% for i in 1..totalPages %}
+                         <li class="page-item {% if i == currentPage %} active {% endif %}" {% if i == currentPage %} aria-current="page" {% endif %}>
+                            <a class="page-link" href="{{ BASE_PATH }}/admin/claims?{{ filters|url_encode }}&page={{ i }}">{{ i }}</a>
+                         </li>
+                     {% endfor %}
+                     <li class="page-item {% if currentPage == totalPages %} disabled {% endif %}">
+                         <a class="page-link" href="{{ BASE_PATH }}/admin/claims?{{ filters|url_encode }}&page={{ currentPage + 1 }}">Next</a>
+                     </li>
+                 </ul>
+             </nav>
+            {% endif %}
+
+        </div> {# End card-body #}
+    </div> {# End card #}
+</div> {# End container #}
+
+<!-- Approve Claim Modal -->
+<div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="approveModalLabel"><i class="bi bi-check-circle-fill text-success me-2"></i>Approve Claim</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to approve this claim?</p>
+        <p class="text-warning"><strong>Item: <span id="approveItemName"></span></strong></p>
+        <p class="text-info"><strong>Claimer: <span id="approveClaimerName"></span></strong></p>
+        <p class="text-muted small">This action will mark the item as "Claimed" and deny other pending claims for this item.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        {# Form action is set dynamically by JavaScript #}
+        <form id="approveForm" action="" method="POST" style="display: inline;">
+             <input type="hidden" name="claim_id" id="approveClaimId">
+             {# Add CSRF token here if using them #}
+             <button type="submit" class="btn btn-success">Approve Claim</button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 
-
+<!-- Deny Claim Modal -->
+<div class="modal fade" id="denyModal" tabindex="-1" aria-labelledby="denyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="denyModalLabel"><i class="bi bi-x-circle-fill text-danger me-2"></i>Deny Claim</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+       {# Form action is set dynamically by JavaScript #}
+      <form id="denyForm" action="" method="POST">
+          <div class="modal-body">
+            <p>Are you sure you want to deny this claim?</p>
+            <p class="text-warning"><strong>Item: <span id="denyItemName"></span></strong></p>
+            <p class="text-info"><strong>Claimer: <span id="denyClaimerName"></span></strong></p>
+            <input type="hidden" name="claim_id" id="denyClaimId">
+            <div class="mb-3">
+                <label for="denyReason" class="form-label small text-muted">Reason for Denial (Optional)</label>
+                <textarea class="form-control form-control-dark" id="denyReason" name="deny_reason" rows="2" placeholder="e.g., Incorrect description provided by claimer..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+             <button type="submit" class="btn btn-danger">Deny Claim</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock %}
+
+{% block javascripts %}
+{{ parent() }} {# Include base template JS if needed #}
+<script>
+    // JavaScript for Approve Modal
+    const approveModal = document.getElementById('approveModal');
+    if (approveModal) {
+      approveModal.addEventListener('show.bs.modal', event => {
+        const triggerButton = event.relatedTarget;
+        const claimId = triggerButton.getAttribute('data-claim-id');
+        const itemName = triggerButton.getAttribute('data-item-name');
+        const claimerName = triggerButton.getAttribute('data-claimer-name');
+        
+        approveModal.querySelector('#approveItemName').textContent = itemName;
+        approveModal.querySelector('#approveClaimerName').textContent = claimerName;
+        approveModal.querySelector('#approveClaimId').value = claimId;
+        approveModal.querySelector('#approveForm').action = `{{ BASE_PATH }}/admin/claims/approve`; 
+      });
+    }
+
+    // JavaScript for Deny Modal
+    const denyModal = document.getElementById('denyModal');
+    if (denyModal) {
+        denyModal.addEventListener('show.bs.modal', event => {
+            const triggerButton = event.relatedTarget;
+            const claimId = triggerButton.getAttribute('data-claim-id');
+            const itemName = triggerButton.getAttribute('data-item-name');
+            const claimerName = triggerButton.getAttribute('data-claimer-name');
+            
+            denyModal.querySelector('#denyItemName').textContent = itemName;
+            denyModal.querySelector('#denyClaimerName').textContent = claimerName;
+            denyModal.querySelector('#denyClaimId').value = claimId;
+            denyModal.querySelector('#denyForm').action = `{{ BASE_PATH }}/admin/claims/deny`;
+        });
+    }
+</script>
+{% endblock %}
+
