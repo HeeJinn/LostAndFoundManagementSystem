@@ -1,0 +1,226 @@
+{% extends "adminbase.html.twig" %} {# Ensure this matches your base template file name #}
+
+{% block title %}Edit Item #{{ item.id }} - {{ item.item_name }}{% endblock %}
+
+{# Add custom styles for this page #}
+{% block styles %}
+    {{ parent() }} {# Include styles from base template #}
+    <style>
+        /* Dark theme for form controls */
+        .form-control-dark {
+            background-color: var(--topbar-search-bg, rgba(255, 255, 255, 0.05));
+            border: 1px solid var(--input-border-color, rgba(255, 255, 255, 0.1));
+            color: var(--topbar-search-text, #fff) !important;
+        }
+        .form-control-dark::placeholder {
+            color: var(--muted-text-color, #6c757d);
+        }
+        .form-control-dark:focus {
+            background-color: var(--topbar-search-bg, rgba(255, 255, 255, 0.05));
+            border-color: var(--sidebar-active-border, #007bff);
+            box-shadow: none;
+            color: var(--topbar-search-text, #fff) !important;
+        }
+        .form-control-dark:disabled, .form-control-dark[readonly] {
+            background-color: rgba(0,0,0,0.2); /* Darker disabled bg */
+            color: var(--muted-text-color, #6c757d);
+            opacity: 0.7;
+        }
+        .form-select-dark {
+            background-color: var(--topbar-search-bg, rgba(255, 255, 255, 0.05));
+            border: 1px solid var(--input-border-color, rgba(255, 255, 255, 0.1));
+            color: var(--topbar-text-color, #A0AABA);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23a0aaba' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        }
+        .form-select-dark:focus {
+             border-color: var(--sidebar-active-border, #007bff);
+             box-shadow: none;
+        }
+        /* Fix for form labels */
+        .card-glass .form-label {
+            color: var(--sidebar-link-color, #A0AABA);
+        }
+        /* New style for the image preview box */
+        .image-preview-box {
+            display: grid;
+            place-content: center;
+            height: 250px;
+            border-radius: 0.375rem; /* Match form control border radius */
+            border: 1px dashed var(--input-border-color, rgba(255, 255, 255, 0.1));
+            background-color: var(--topbar-search-bg, rgba(255, 255, 255, 0.05));
+            padding: 0.5rem;
+        }
+    </style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid">
+    {# Use item.id and item.item_name in the title #}
+    <h1 class="h2 mb-4 dash-title">Edit Item: <span class="text-primary">{{ item.item_name | default('...') }}</span> <small class="text-muted">(#{{ item.id }})</small></h1>
+
+    {# Display Errors if any (from POST request) #}
+    {% if errors is defined and errors is not empty %}
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Please fix the following errors:</h4>
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <div class="card card-glass p-4 p-md-5">
+        {# Form points back to the edit route and handles file uploads #}
+        <form method="POST" action="{{ BASE_PATH }}/admin/items/edit" enctype="multipart/form-data">
+            
+            {# CRITICAL: Hidden input to send the item's ID back on POST #}
+            <input type="hidden" name="item_id" value="{{ item.id }}">
+            {# Hidden input for the reporter ID, needed for backend update #}
+            <input type="hidden" name="reporter_id" value="{{ item.reporter_id }}">
+
+
+            <div class="row">
+                {# --- LEFT COLUMN (Image & Status) --- #}
+                <div class="col-lg-5">
+                    <div class="mb-4">
+                        <label for="itemImageInput" class="form-label">Item Image (Upload to Replace)</label>
+                        {# Image Preview Area - Shows current image by default #}
+                        <div class="image-preview-box text-center mb-2">
+                            {# Shows current item image by default #}
+                            <img id="imagePreview" src="{{ BASE_PATH }}/{{ item.item_image_url | default('https://placehold.co/200x200?text=No+Image') }}" alt="Current Image" class="img-fluid rounded" style="display: block; max-height: 230px; object-fit: contain;">
+                            {# Placeholder for new image (initially hidden) #}
+                            <div id="imagePlaceholder" style="display: none;">
+                                <i class="bi bi-image" style="font-size: 3rem; color: #ccc;"></i>
+                                <p class="text-muted small mt-2">New image preview</p>
+                            </div>
+                        </div>
+                        <input class="form-control form-control-dark" type="file" id="itemImageInput" name="itemImage" accept="image/png, image/jpeg, image/gif">
+                         <div class="form-text text-muted">Leave blank to keep the current image.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label d-block mb-2">Status</label>
+                        <div>
+                            {# Check the current item status #}
+                            <input type="radio" class="btn-check" name="itemStatus" id="status-found" value="found" autocomplete="off" {% if item.item_status == 'found' %}checked{% endif %}>
+                            <label class="btn btn-outline-success" for="status-found"><i class="bi bi-check-circle-fill pe-1"></i>Found</label>
+
+                            <input type="radio" class="btn-check" name="itemStatus" id="status-claimed" value="claimed" autocomplete="off" {% if item.item_status == 'claimed' %}checked{% endif %}>
+                            <label class="btn btn-outline-primary" for="status-claimed"><i class="bi bi-person-check-fill pe-1"></i>Claimed</label>
+
+                            <input type="radio" class="btn-check" name="itemStatus" id="status-archived" value="archived" autocomplete="off" {% if item.item_status == 'archived' %}checked{% endif %}>
+                            <label class="btn btn-outline-secondary" for="status-archived"><i class="bi bi-archive-fill pe-1"></i>Archived</label>
+                        </div>
+                    </div>
+                </div>
+
+                {# --- RIGHT COLUMN (Item & Reporter Details) --- #}
+                <div class="col-lg-7">
+                    <div class="mb-3">
+                        <label for="item_name" class="form-label">Item name</label>
+                        {# Pre-fill value from the item object #}
+                        <input type="text" class="form-control form-control-dark" id="item_name" name="item_name" value="{{ item.item_name | escape('html_attr') }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="item_description" class="form-label">Item description</label>
+                        {# Pre-fill textarea content #}
+                        <textarea class="form-control form-control-dark" id="item_description" name="item_description" rows="3" required>{{ item.item_description }}</textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="category" class="form-label">Category</label>
+                            <select class="form-select form-select-dark" id="category" name="category" required>
+                                <option value="" disabled>Choose...</option>
+                                {# Loop and check against item.category_id #}
+                                {# Note: The column name in your PHP query is 'cat_id' #}
+                                <option value="1" {% if item.cat_id == 1 %}selected{% endif %}>Electronics</option>
+                                <option value="2" {% if item.cat_id == 2 %}selected{% endif %}>Books & Notes</option>
+                                <option value="3" {% if item.cat_id == 3 %}selected{% endif %}>Clothing</option>
+                                <option value="4" {% if item.cat_id == 4 %}selected{% endif %}>IDs & Cards</option>
+                                <option value="5" {% if item.cat_id == 5 %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="location_found" class="form-label">Location Found</label>
+                            <input type="text" class="form-control form-control-dark" id="location_found" name="location_found" value="{{ item.found_location | escape('html_attr') }}" required>
+                        </div>
+                    </div>
+
+                    <hr class="my-3">
+                    {# MODIFIED: Removed (Read-Only) and descriptive text #}
+                    <h5 class="mb-3">Reporter Information</h5>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="first_name" class="form-label">First Name</label>
+                            {# MODIFIED: Removed readonly/disabled, added name attribute #}
+                            <input type="text" class="form-control form-control-dark" id="first_name" name="first_name" value="{{ item.first_name | escape('html_attr') }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="last_name" class="form-label">Last Name</label>
+                             {# MODIFIED: Removed readonly/disabled, added name attribute #}
+                            <input type="text" class="form-control form-control-dark" id="last_name" name="last_name" value="{{ item.last_name | escape('html_attr') }}" required>
+                        </div>
+                         <div class="col-md-6 mb-3">
+                            <label for="student_id" class="form-label">Student ID</label>
+                             {# MODIFIED: Removed readonly/disabled, added name attribute #}
+                            <input type="text" class="form-control form-control-dark" id="student_id" name="student_id" value="{{ item.student_id | escape('html_attr') }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email</label>
+                             {# MODIFIED: Removed readonly/disabled, added name attribute #}
+                            <input type="email" class="form-control form-control-dark" id="email" name="email" value="{{ item.email | escape('html_attr') }}" required>
+                        </div>
+                        {# ADDED: Contact Number field #}
+                        <div class="col-md-6 mb-3">
+                            <label for="contact_number" class="form-label">Contact Number</label>
+                             {# MODIFIED: Added field, added name attribute #}
+                            <input type="tel" class="form-control form-control-dark" id="contact_number" name="contact_number" value="{{ item.contact_number | escape('html_attr') }}" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="row mt-4">
+                <div class="col-12 text-end">
+                    <a href="{{ BASE_PATH }}/admin/items" class="btn btn-outline-secondary btn-lg me-2">Cancel</a>
+                    <button type="submit" class="btn btn-primary btn-lg">Save Changes</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }} {# Include base template JS if needed #}
+<script>
+    // JavaScript for Image Preview on this page
+    const itemImageInput = document.getElementById('itemImageInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const imagePlaceholder = document.getElementById('imagePlaceholder');
+    const originalImageUrl = imagePreview.src; // Store the original image URL
+
+    itemImageInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+                imagePlaceholder.style.display = 'none';
+            }
+            reader.readAsDataURL(file);
+        } else {
+             // If user cancels file selection, revert to the original image
+             imagePreview.src = originalImageUrl;
+             imagePreview.style.display = 'block';
+             imagePlaceholder.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}
+
